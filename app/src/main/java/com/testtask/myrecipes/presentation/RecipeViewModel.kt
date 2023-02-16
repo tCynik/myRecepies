@@ -7,11 +7,12 @@ import com.testtask.myrecipes.data.interfaces.RecipesStorageRepositoryInterface
 import com.testtask.myrecipes.data.models.SingleRecipeData
 import com.testtask.myrecipes.data.network.URLConstantsSet
 import com.testtask.myrecipes.domain.RecipesRepositoryManager
+import com.testtask.myrecipes.domain.models.SingleRecipe
 import com.testtask.myrecipes.presentation.interfaces.ToasterInterface
 
 class RecipeViewModel(private val toaster: ToasterInterface,
                       private val constantsURLSet: URLConstantsSet): ViewModel() {
-    val recipesData: MutableLiveData<List<SingleRecipeData>> = MutableLiveData()
+    val recipesData: MutableLiveData<MutableList<SingleRecipe>> = MutableLiveData()
     val repositoryManager = RecipesRepositoryManager(toaster, constantsURLSet)
 
 //    init {

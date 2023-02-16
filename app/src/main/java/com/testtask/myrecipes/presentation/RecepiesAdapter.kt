@@ -12,7 +12,11 @@ import com.testtask.myrecipes.domain.models.SingleRecipe
 
 class RecepiesAdapter: RecyclerView.Adapter<RecepiesAdapter.MyViewHolder>() {
     val numberItems: Int = 10
-    val recipesContent = mutableListOf<SingleRecipe>()
+    var recipesContent = mutableListOf<SingleRecipe>()
+    set(newValue) {
+        field = newValue
+        notifyDataSetChanged() // todo: for optimization make notifyItemChanged()
+    }
 
     class MyViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         private val name = itemView.findViewById<TextView>(R.id.name)
@@ -61,7 +65,8 @@ class RecepiesAdapter: RecyclerView.Adapter<RecepiesAdapter.MyViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        holder.bind(position)
+        val lineData = recipesContent[position]
+        holder.bind(position, lineData)
     }
 
     override fun getItemCount(): Int {

@@ -2,57 +2,211 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
-    <ImageView
-        android:id="@+id/image_place"
-        android:layout_width="90dp"
-        android:layout_height="80dp"
-        android:src="@drawable/no_image"/>
-    <TextView
-        android:id="@+id/name"
+    android:orientation="vertical">
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="name"/>
-    <TextView
-        android:id="@+id/headline"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="headline"/>
-    <TextView
-        android:id="@+id/description"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="description"/>
-    <TextView
-        android:id="@+id/calories"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="cal"/>
-    <TextView
-        android:id="@+id/difficulty"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="dif"/>
-    <TextView
-        android:id="@+id/fats"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="ft"/>
-    <TextView
-        android:id="@+id/proteins"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="pr"/>
-    <TextView
-        android:id="@+id/carbos"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="cr"/>
-    <TextView
-        android:id="@+id/time"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="ct"/>
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/image_place"
+                android:layout_width="match_parent"
+                android:layout_height="90dp"
+                android:src="@drawable/no_image"/>
+            <TextView
+                android:id="@+id/headline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="10sp"
+                android:text="with Sweet Potato Wedges and Minted Snap Peas"/>
+
+        </LinearLayout>
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:gravity="center"
+                    android:id="@+id/name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    android:text="Genki Yakitori with Crispy Red Onions"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/calories"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        android:text="516"/>
+                    <TextView
+                        android:layout_marginStart="5sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="bottom"
+                        android:textSize="8sp"
+                        android:text="kcal"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_gravity="end"
+                    android:gravity="end">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="bottom"
+                        android:textSize="8sp"
+                        android:text="difficulty"/>
+                    <TextView
+                        android:id="@+id/difficulty"
+                        android:layout_marginHorizontal="5sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="bottom"
+                        android:textSize="12sp"
+                        android:textColor="@color/black"
+                        android:text="0"/>
+                </LinearLayout>
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="10sp"
+                    android:text="There\u2019s nothing like the simple things in life - the smell of freshly cut grass, sitting outside on a nice sunny day, spending time with friends and family. Well here is a recipe that delivers simple culinary pleasures - some nice fresh fish with a crispy crust, crunchy potato wedges and some delightfully sweet sugar snap peas flavoured with cooling mint. Slip into something comfortable and relax into a delicious dinner!"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="end">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="bottom"
+                        android:layout_marginEnd="30sp"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="10sp"
+                            android:text="time:"/>
+                        <TextView
+                            android:id="@+id/time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="5sp"
+                            android:textColor="@color/black"
+                            android:textSize="12sp"
+                            android:text="35"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="10sp"
+                            android:text="min"/>
+
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="bottom"
+                        android:orientation="horizontal">
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="10sp"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="10sp"
+                                android:text="fats:"/>
+                            <TextView
+                                android:id="@+id/fats"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="5sp"
+                                android:textColor="@color/black"
+                                android:textSize="12sp"
+                                android:text="8"/>
+
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="10sp"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="10sp"
+                                android:text="proteins:"/>
+                            <TextView
+                                android:id="@+id/proteins"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="5sp"
+                                android:textColor="@color/black"
+                                android:textSize="12sp"
+                                android:text="8"/>
+
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="10sp"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="10sp"
+                                android:text="carbos:"/>
+                            <TextView
+                                android:id="@+id/carbos"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="5sp"
+                                android:textColor="@color/black"
+                                android:textSize="12sp"
+                                android:text="8"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </LinearLayout>
+
+
+
 
 
 </LinearLayout>
