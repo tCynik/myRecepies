@@ -1,4 +1,4 @@
 package com.testtask.myrecipes.domain
 
-class RecipeViewModel {
+class PictureRepositoryManager {
 }
