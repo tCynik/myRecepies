@@ -1,5 +1,6 @@
 package com.testtask.myrecipes.domain.models
 
+import android.graphics.drawable.Drawable
 import android.media.Image
 
 /**
@@ -9,4 +10,4 @@ import android.media.Image
 
 data class PictureModel(val networkAddress: String,
                         val localAddress: String,
-                        val image: Image?)
+                        val image: Drawable?)

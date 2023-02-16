@@ -2,32 +2,19 @@ package com.testtask.myrecipes.data.network
 
 /**
  * Класс для составления ЮРЛ.
- * В конструктор принимает мапу с элементами адреса <String, String>,
- * где ключ = тип элемента (базовый ЮРЛ, индекс запрос, и т.д.),
- * а значение = его значение для вставки в адрес
+ * В конструктор принимает класс с константами для формирования запроса
+ * конкретный состав запроса орпеделяется выбором методов запроса, для расширения функционала добавить метод
+ * если понадобится формировать запрос другого содержания, например обновления рецепта по его id:
+ * // к примеру, обновление вызывается запросом: https://hf-android-app.s3-eu-west-1.amazonaws.com/android-test/recipe/id.json,
+ * //   где id = подставленный айди записи,
+ * в URLConstantsSet добавляется поле val recepieById: String, которому в активити инжектится значение "recipe/"
+ * в класс добавляется метод fun makeURLRecepieById(id: String)
  */
 
-const val KEY_BASE = "baseURL" // ключ вынесен в константу для исключения опечаток
-const val ERROR = "error" // на случай если поступит инвалидная мапа без ЮРЛ
-
-class URLMaker(private val addresses: Map<String, String>) {
-    fun makeURL(requestType: String): String {
-        val baseURL = getBaseURL()
-        val request = getRequest(requestType)
+class URLMaker(private val constantsURLSet: URLConstantsSet) {
+    fun makeURLRecipesList(): String {
+        val baseURL = constantsURLSet.baseURL
+        val request = constantsURLSet.recipesList
         return baseURL.plus(request)
-    }
-
-    // получаем из мапы базовый ЮРЛ
-    private fun getBaseURL(): String? {
-        return if (addresses.containsKey(KEY_BASE))
-            addresses[KEY_BASE]
-        else ERROR
-    }
-
-    // получаем конкретную транскрипцию ЮРЛ запроса
-    private fun getRequest(type: String): String? {
-        return if (addresses.containsKey(type))
-            addresses[type]
-        else ERROR
     }
 }

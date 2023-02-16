@@ -3,7 +3,7 @@ package com.testtask.myrecipes.data.models
 import android.media.Image
 
 data class SingleRecipeData(
-    val id: Long,
+    val id: String,
     val name: String,
     val description: String,
     val headline: String,

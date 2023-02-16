@@ -6,7 +6,7 @@ import android.media.Image
  * Модель отвечающая за хранение данных каждого отдельного рецепта
  */
 data class SingleRecipe(
-    val id: Long,
+    val id: String,
     val name: String,
     val description: String,
     val headline: String,
