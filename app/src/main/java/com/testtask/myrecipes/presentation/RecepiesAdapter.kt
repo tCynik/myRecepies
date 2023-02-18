@@ -12,7 +12,7 @@ import com.testtask.myrecipes.domain.models.SingleRecipe
 
 class RecepiesAdapter: RecyclerView.Adapter<RecepiesAdapter.MyViewHolder>() {
     val numberItems: Int = 10
-    var recipesContent = mutableListOf<SingleRecipe>()
+    var recipesContent = listOf<SingleRecipe>()
     set(newValue) {
         field = newValue
         notifyDataSetChanged() // todo: for optimization make notifyItemChanged()

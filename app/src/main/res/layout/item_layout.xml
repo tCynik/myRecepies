@@ -42,25 +42,14 @@
                     android:textColor="@color/black"
                     android:textSize="12sp"
                     android:text="Genki Yakitori with Crispy Red Onions"/>
-                <LinearLayout
-                    android:layout_width="match_parent"
+
+                <TextView
+                    android:id="@+id/calories"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:id="@+id/calories"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:textColor="@color/black"
-                        android:textSize="12sp"
-                        android:text="516"/>
-                    <TextView
-                        android:layout_marginStart="5sp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="bottom"
-                        android:textSize="8sp"
-                        android:text="kcal"/>
-                </LinearLayout>
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    android:text="516 kcal"/>
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -110,23 +99,13 @@
                         android:layout_marginEnd="30sp"
                         android:orientation="horizontal">
                         <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="10sp"
-                            android:text="time:"/>
-                        <TextView
                             android:id="@+id/time"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginHorizontal="5sp"
                             android:textColor="@color/black"
                             android:textSize="12sp"
-                            android:text="35"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="10sp"
-                            android:text="min"/>
+                            android:text="PT35M"/>
 
                     </LinearLayout>
 
@@ -153,7 +132,7 @@
                                 android:layout_marginStart="5sp"
                                 android:textColor="@color/black"
                                 android:textSize="12sp"
-                                android:text="8"/>
+                                android:text="8 g"/>
 
                         </LinearLayout>
                         <LinearLayout
@@ -173,7 +152,7 @@
                                 android:layout_marginStart="5sp"
                                 android:textColor="@color/black"
                                 android:textSize="12sp"
-                                android:text="8"/>
+                                android:text="8 g"/>
 
                         </LinearLayout>
                         <LinearLayout
@@ -193,7 +172,7 @@
                                 android:layout_marginStart="5sp"
                                 android:textColor="@color/black"
                                 android:textSize="12sp"
-                                android:text="8"/>
+                                android:text="8 g"/>
 
                         </LinearLayout>
 

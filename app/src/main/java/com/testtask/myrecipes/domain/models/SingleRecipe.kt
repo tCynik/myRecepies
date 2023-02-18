@@ -11,11 +11,11 @@ data class SingleRecipe(
     val description: String,
     val headline: String,
     val difficulty: Int,
-    val calories: Int,
-    val fats: Int,
-    val proteins: Int,
-    val carbos: Int,
-    val cookingTine: Int,
+    val calories: String,
+    val fats: String,
+    val proteins: String,
+    val carbos: String,
+    val cookingTime: String,
     val full_image: PictureModel, // в модели класса Data тут будет имя файла
     val pre_image: PictureModel, // в модели класса Data тут будет имя файла
     ) {
