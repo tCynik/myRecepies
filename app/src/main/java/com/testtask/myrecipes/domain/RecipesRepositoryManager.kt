@@ -1,10 +1,9 @@
 package com.testtask.myrecipes.domain
 
+import android.util.Log
 import com.testtask.myrecipes.data.interfaces.RecipesStorageRepositoryInterface
-import com.testtask.myrecipes.data.network.ParserJson
-import com.testtask.myrecipes.data.network.RecipesRequestRepository
-import com.testtask.myrecipes.data.network.URLConstantsSet
-import com.testtask.myrecipes.data.network.URLMaker
+import com.testtask.myrecipes.data.network.*
+import com.testtask.myrecipes.domain.interfaces.ResponseResultBacallInterface
 import com.testtask.myrecipes.domain.models.SingleRecipe
 import kotlinx.coroutines.CoroutineScope
 
@@ -23,8 +22,9 @@ class RecipesRepositoryManager(
     private val constantsURLSet: URLConstantsSet,
     private val scope: CoroutineScope
                         ) {
-    private val requestMaker = RecipesRequestRepository(errorsProcessor, scope)
+    private val requestMaker = RecipesRequestMaker(errorsProcessor, scope)
     private val parser = ParserJson()
+
 
     // по получаемому из активити репозиториям отрабатываем варианты загрузки
     fun updateData(
@@ -33,33 +33,26 @@ class RecipesRepositoryManager(
         // todo: logic with update method: network or local storage
 
         // переходим к запросу из сети
+        
+        val callbackInterface = object : ResponseResultBacallInterface {
+            override fun onGetResult(result: List<SingleRecipe>) {
+
+            }
+        }
+        val netDirector = NetRecipesListDirector()
         val requestString = URLMaker(constantsURLSet).makeURLRecipesList() // формируем запрос
         val responseJsonArray = requestMaker.makeRequest(requestString) // направляем запрос
 
         val resultData = parser.parseJson(responseJsonArray!!) // парсим ответ в формат List<SingleRecipe>
-        return resultData
-    }
+        Log.i("bugfix: recipesRequestRepo", "result[0] - ${resultData[0].headline}")
 
-    // тут обрабатывается вариант загрузки данных из сети
-//    private fun updateDataFromNetwork(repository: RecipesNetRepositoryInterface, URLrequest: String): List<SingleRecipe> {
-//        val resultJson = repository.makeRequest(URLrequest)
-//        val intermediateData = ParserJson().parseJson(resultJson)
-//
-//        val resultData = mutableListOf<SingleRecipe>()
-//        val mapper = DataToDomainMapper()
-//        intermediateData.forEach{ recepie -> resultData.add(mapper.execute(recepie))}
-//        return resultData
-//
-//        // todo: обработать вариант появления пустого результата
-//        // в итоге, из вью модели обновляем список, выводим его
-//        //      если картинки не все, показываем надпись loading...
-//        //      во вью модели создаем интерфейс для обновления ливдаты
-//        //      передаем интерфейс в PictureRepository с запросом на поиск картинок
-//        //      PictureRepository запускает кучу короутин, которые гуглят картинки, и обновляет вью
-//    }
+        return listOf()//resultData
+    }
 
     private fun updateDataFromStorage(repository: RecipesStorageRepositoryInterface){
 
     }
+
+    private fun returnAnswer(result)
 
 }
