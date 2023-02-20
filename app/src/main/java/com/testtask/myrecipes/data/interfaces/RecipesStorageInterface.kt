@@ -1,5 +1,5 @@
 package com.testtask.myrecipes.data.interfaces
 
-interface RecipesStorageRepositoryInterface {
+interface RecipesStorageInterface {
     fun updateRecipesData(){}
 }

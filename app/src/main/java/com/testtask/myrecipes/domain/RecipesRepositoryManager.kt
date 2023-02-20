@@ -1,11 +1,13 @@
 package com.testtask.myrecipes.domain
 
 import android.util.Log
-import com.testtask.myrecipes.data.interfaces.RecipesStorageRepositoryInterface
+import com.testtask.myrecipes.data.interfaces.RecipesNetRepositoryInterface
+import com.testtask.myrecipes.data.interfaces.RecipesStorageInterface
 import com.testtask.myrecipes.data.network.*
-import com.testtask.myrecipes.domain.interfaces.ResponseResultBacallInterface
 import com.testtask.myrecipes.domain.models.SingleRecipe
+import com.testtask.myrecipes.presentation.interfaces.RecipesCallbackInterface
 import kotlinx.coroutines.CoroutineScope
+import org.json.JSONArray
 
 /**
  * короче, мы либо берем из репозитория, либо (доп.задача) из инета
@@ -20,39 +22,53 @@ import kotlinx.coroutines.CoroutineScope
 class RecipesRepositoryManager(
     private val errorsProcessor: ErrorsProcessor,
     private val constantsURLSet: URLConstantsSet,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
+    private val recipesDataCallbackInterface: RecipesCallbackInterface
                         ) {
-    private val requestMaker = RecipesRequestMaker(errorsProcessor, scope)
-    private val parser = ParserJson()
+    private var currentData: List<SingleRecipe>? = null // текущие данные, согласно последнему обновлению
+
+    private val parser = ParserJson() // парсинг ответа из JSONArray
+    private var requestMaker: RecipesRequestMaker? = null // инстанс, отвечающий за формирование запроса
+    init {
+        val callbackInterface = object : RecipesNetRepositoryInterface { // коллбек для возврата результата при его получении
+            var resultData: List<SingleRecipe>? = null
+            override fun onHasResponse(jSonData: JSONArray) {
+                resultData = parser.parseJson(jSonData!!) // парсим ответ в формат List<SingleRecipe>
+                if (resultData == null) noNetData()
+                else {
+                    if (currentData == null) {
+                        currentData = resultData
+                        recipesDataCallbackInterface.onGotRecipesData(resultData!!)
+                    }
+                    Log.i("bugfix: recipesRequestRepo", "result[0] - ${resultData!![0].headline}")
+                }
+            }
+        }
+        requestMaker = RecipesRequestMaker(errorsProcessor, scope, callbackInterface)
+    }
 
 
     // по получаемому из активити репозиториям отрабатываем варианты загрузки
     fun updateData(
-        repositoryFromStorage: RecipesStorageRepositoryInterface
+        repositoryFromStorage: RecipesStorageInterface // для работы с контекстом передаем сюда storage для загрузки из памяти
     ): List<SingleRecipe> {
-        // todo: logic with update method: network or local storage
+        // todo: сначала обращаемся к storage и качаем дату из памяти потом обращаемся в интернет.
+        //  Когда приходит ответ из сети и если он отличается от информации из памяти, обновляем даныне
 
-        // переходим к запросу из сети
-        
-        val callbackInterface = object : ResponseResultBacallInterface {
-            override fun onGetResult(result: List<SingleRecipe>) {
 
-            }
-        }
-        val netDirector = NetRecipesListDirector()
-        val requestString = URLMaker(constantsURLSet).makeURLRecipesList() // формируем запрос
-        val responseJsonArray = requestMaker.makeRequest(requestString) // направляем запрос
-
-        val resultData = parser.parseJson(responseJsonArray!!) // парсим ответ в формат List<SingleRecipe>
-        Log.i("bugfix: recipesRequestRepo", "result[0] - ${resultData[0].headline}")
+        // создание и обработка запроса данных из сети
+        val requestURL = URLMaker(constantsURLSet).makeURLRecipesList() // формируем запрос
+        requestMaker!!.myAsyncRequest(requestURL)
 
         return listOf()//resultData
     }
 
-    private fun updateDataFromStorage(repository: RecipesStorageRepositoryInterface){
+    private fun updateDataFromStorage(repository: RecipesStorageInterface){
 
     }
 
-    private fun returnAnswer(result)
+    private fun noNetData(){// вызывается для отбаботки ошибок и отправки сообщений
+
+    }
 
 }

@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.testtask.myrecipes.data.network.URLConstantsSet
-import com.testtask.myrecipes.data.storage.StorageRepository
+import com.testtask.myrecipes.data.storage.Storage
 import com.testtask.myrecipes.presentation.RecepiesAdapter
 import com.testtask.myrecipes.presentation.RecipeViewModel
 
@@ -35,9 +35,9 @@ class MainActivity : AppCompatActivity() {
             Observer{ recipesData -> recepiesAdapter.recipesContent = recipesData})
 
         // готовим интерфейсы репозиториев для работы с контекстом при обновлении информации
-        val storageRepository = StorageRepository()
+        val storageRepository = Storage()
         // запуск обновления данных
-        recipesViewModel.updateDataWhenActivityStarted(
+        recipesViewModel.updateDataWhenActivityStarted( // инициируем обновление данных
             repositoryStorage = storageRepository)
 
         val constantsURL = URLConstantsSet(

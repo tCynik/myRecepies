@@ -22,19 +22,21 @@ import java.net.URL
 class RecipesRequestMaker(
     val errorsProcessor: ErrorsProcessor,
     val scope: CoroutineScope,
-    ): RecipesNetRepositoryInterface {
+    val resultInterface: RecipesNetRepositoryInterface
+    ) {
 
-    override fun makeRequest(addressURL: String): JSONArray? {
-        var result: JSONArray? = null
-        scope.launch {
-            withContext(Dispatchers.Default) {
-                result = asyncUpdating(addressURL)
-            }
-        }
-        Log.i("bugfix: recipesRequestRepo", "json in MyAsync = $result")
-        return result
-
-    }
+//    override fun makeRequest(addressURL: String): JSONArray? {
+//        var result: JSONArray? = null
+//        scope.launch {
+//            withContext(Dispatchers.Default) {
+//                result = asyncUpdating(addressURL)
+//                resultInterface.
+//            }
+//        }
+//        Log.i("bugfix: recipesRequestRepo", "json in MyAsync = $result")
+//        return result
+//
+//    }
 
     fun asyncUpdating(addressURL: String): JSONArray? { // метод асинхронного обращени к серверу
         Log.i("bugfix: recipesRequestRepo", "starting")
