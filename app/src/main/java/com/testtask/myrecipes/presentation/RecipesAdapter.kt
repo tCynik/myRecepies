@@ -10,8 +10,8 @@ import com.testtask.myrecipes.R
 import com.testtask.myrecipes.domain.models.PictureModel
 import com.testtask.myrecipes.domain.models.SingleRecipe
 
-class RecepiesAdapter: RecyclerView.Adapter<RecepiesAdapter.MyViewHolder>() {
-    val numberItems: Int = 10
+class RecipesAdapter: RecyclerView.Adapter<RecipesAdapter.MyViewHolder>() {
+    //val numberItems: Int = 10
     var recipesContent = listOf<SingleRecipe>()
     set(newValue) {
         field = newValue
@@ -29,17 +29,17 @@ class RecepiesAdapter: RecyclerView.Adapter<RecepiesAdapter.MyViewHolder>() {
         private val carbos = itemView.findViewById<TextView>(R.id.carbos)
         private val imagePlace = itemView.findViewById<ImageView>(R.id.image_place)
 
-        fun bind(position: Int, content: SingleRecipe) { // функция, выполняемая при биндинге к конкретному холдеру
-            name.text = content.name
-            headline.text = content.headline
-            description.text = content.description
-            difficulty.text = content.difficulty.toString()
-            calories.text = content.calories.toString()
-            fats.text = content.fats.toString()
-            proteins.text = content.proteins.toString()
-            carbos.text = content.carbos.toString()
+        fun bind(contentLine: SingleRecipe) { // функция, выполняемая при биндинге к конкретному холдеру
+            name.text = contentLine.name
+            headline.text = contentLine.headline
+            description.text = contentLine.description
+            difficulty.text = contentLine.difficulty.toString()
+            calories.text = contentLine.calories.toString()
+            fats.text = contentLine.fats.toString()
+            proteins.text = contentLine.proteins.toString()
+            carbos.text = contentLine.carbos.toString()
 
-            placePhoto(content.pre_image)
+            placePhoto(contentLine.pre_image)
         }
 
         private fun placePhoto(pre_image: PictureModel) {
@@ -56,20 +56,17 @@ class RecepiesAdapter: RecyclerView.Adapter<RecepiesAdapter.MyViewHolder>() {
         val view = inflator.inflate(itemId, parent, false)
 
         val viewHolder = MyViewHolder(view)
-// Далее значения при создании вью холдера
-// значение, постоянное для каждого вью холдера (повторяющееся при переиспользовании)
-//        viewHolder.viewHolderNumber.text = "VH index = $nubmerViewHolders"
-//        nubmerViewHolders++
         return viewHolder
-
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val lineData = recipesContent[position]
-        holder.bind(position, lineData)
+        if (recipesContent.isNotEmpty()) { // если данных пока нет, биндить нечего
+            val lineData = recipesContent[position]
+            holder.bind(lineData)
+        }
     }
 
     override fun getItemCount(): Int {
-        return  numberItems
+        return  recipesContent.size
     }
 }

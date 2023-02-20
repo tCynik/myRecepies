@@ -10,13 +10,8 @@ import kotlinx.coroutines.CoroutineScope
 import org.json.JSONArray
 
 /**
- * короче, мы либо берем из репозитория, либо (доп.задача) из инета
- **
- * // управление репозиторием - делаем запрос, возвращаем распарсенную дату
- *
- * Класс, ответственный за упарвлением запросами составление URL запроса (в отдельном классе)
- * и направление его на сервер
- * На вход получает готовый URL запрос, возвращает Json ответ в формате String
+ * Класс, ответственный за упарвлением получением данных. Он решает, какие запросы направлять
+ * на сервер, какиее - в Storage.
  */
 
 class RecipesRepositoryManager(
@@ -32,21 +27,20 @@ class RecipesRepositoryManager(
     init {
         val callbackInterface = object : RecipesNetRepositoryInterface { // коллбек для возврата результата при его получении
             var resultData: List<SingleRecipe>? = null
-            override fun onHasResponse(jSonData: JSONArray) {
+            override fun onHasResponse(jSonData: JSONArray) { // при получении ответа
                 resultData = parser.parseJson(jSonData!!) // парсим ответ в формат List<SingleRecipe>
-                if (resultData == null) noNetData()
-                else {
+                if (resultData == null) noNetData() // если ответа нет
+                else { // если ответ есть
                     if (currentData == null) {
                         currentData = resultData
                         recipesDataCallbackInterface.onGotRecipesData(resultData!!)
                     }
-                    Log.i("bugfix: recipesRequestRepo", "result[0] - ${resultData!![0].headline}")
                 }
             }
         }
+        // инстанс, отвечающий за URL запрос, в конструктор получает реализацию интерфейса для коллбека
         requestMaker = RecipesRequestMaker(errorsProcessor, scope, callbackInterface)
     }
-
 
     // по получаемому из активити репозиториям отрабатываем варианты загрузки
     fun updateData(
@@ -68,7 +62,7 @@ class RecipesRepositoryManager(
     }
 
     private fun noNetData(){// вызывается для отбаботки ошибок и отправки сообщений
-
+        Log.i("bugfix: recipesRepoManager", "result data is null")
     }
 
 }

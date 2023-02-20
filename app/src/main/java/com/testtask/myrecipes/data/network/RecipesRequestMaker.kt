@@ -25,43 +25,25 @@ class RecipesRequestMaker(
     val resultInterface: RecipesNetRepositoryInterface
     ) {
 
-//    override fun makeRequest(addressURL: String): JSONArray? {
-//        var result: JSONArray? = null
-//        scope.launch {
-//            withContext(Dispatchers.Default) {
-//                result = asyncUpdating(addressURL)
-//                resultInterface.
-//            }
-//        }
-//        Log.i("bugfix: recipesRequestRepo", "json in MyAsync = $result")
-//        return result
-//
-//    }
-
     fun asyncUpdating(addressURL: String): JSONArray? { // метод асинхронного обращени к серверу
-        Log.i("bugfix: recipesRequestRepo", "starting")
-
         val url = URL(addressURL)
         val connection: HttpURLConnection
         connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
         //connection.connectTimeout = 10000 // таймаут соединения
-        Log.i("bugfix: recipesRequestRepo", "going 2 make connection on address: $addressURL")
 
         val response = StringBuilder()
 
         try{
-            Log.i("bugfix: recipesRequestRepo", "try to connect")
             connection.connect()
-
             Log.i("bugfix: recipesRequestRepo", "connected code - ${connection.responseCode}")
+            // todo: switch to logger
 
             val inputStream = connection.inputStream
             val bufferedReader = BufferedReader(InputStreamReader(inputStream))
 
             var line: String?
             line = bufferedReader.readLine()
-            Log.i("bugfix: recipesRequestRepo", "first line =  $line")
 
             while (line != null) {
                 response.append(line)
@@ -90,9 +72,9 @@ class RecipesRequestMaker(
         scope.launch {
             withContext(Dispatchers.Default) {
                 result = asyncUpdating(url)
+                result?.let { resultInterface.onHasResponse(it) }
             }
         }
-        Log.i("bugfix: recipesRequestRepo", "json in MyAsync = $result")
         return result
     }
 }
