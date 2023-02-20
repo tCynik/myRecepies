@@ -10,6 +10,8 @@ import com.testtask.myrecipes.domain.ErrorsProcessor
 import com.testtask.myrecipes.domain.RecipesRepositoryManager
 import com.testtask.myrecipes.domain.models.SingleRecipe
 import com.testtask.myrecipes.presentation.interfaces.RecipesCallbackInterface
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 const val BASE_URL = "https://hf-android-app.s3-eu-west-1.amazonaws.com/android-test/"
 const val RECIPES_LIST = "recipes.json"
@@ -24,7 +26,8 @@ class RecipeViewModel: ViewModel() {
     init {
         val recipesDataCallbackInterface = object: RecipesCallbackInterface{ // интерфейс коллбека результатов
             override fun onGotRecipesData(data: List<SingleRecipe>) {
-                recipesDataLive.value = data
+                // обновляем UI в главном потоке
+                viewModelScope.launch(Dispatchers.Main) { recipesDataLive.value = data }
             }
 
         }
