@@ -3,6 +3,7 @@ package com.testtask.myrecipes
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,8 +14,8 @@ import com.testtask.myrecipes.presentation.RecipeViewModel
 
 class MainActivity : AppCompatActivity() {
     var myRecyclerView: RecyclerView? = null
-    //private val elementsCount = 20 - количесвто элементов в адаптере, а надо ли?
     val recepiesAdapter = RecepiesAdapter()
+    var recipesViewModel: RecipeViewModel? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,21 +29,24 @@ class MainActivity : AppCompatActivity() {
         myRecyclerView!!.setHasFixedSize(true) // нужно тупо для эффективности
         myRecyclerView!!.adapter = recepiesAdapter
 
-        // инициируем ViewModel обсервер ливдаты VM
-        val recipesViewModel = ViewModelProvider(this).get(RecipeViewModel::class.java)
-        recipesViewModel.recipesDataLive.observe(
-            this,
-            Observer{ recipesData -> recepiesAdapter.recipesContent = recipesData})
+        // инициируем ViewModel и обсервер ливдаты VM
+        recipesViewModel = ViewModelProvider(this).get(RecipeViewModel::class.java)
 
         // готовим интерфейсы репозиториев для работы с контекстом при обновлении информации
         val storageRepository = Storage()
         // запуск обновления данных
-        recipesViewModel.updateDataWhenActivityStarted( // инициируем обновление данных
+        recipesViewModel!!.updateDataWhenActivityStarted( // инициируем обновление данных
             repositoryStorage = storageRepository)
+    }
 
-        val constantsURL = URLConstantsSet(
-            baseURL = getString(R.string.base_url),
-            recipesList = getString(R.string.type_url))
+    override fun onStart() {
+        super.onStart()
+        initObservers()
+    }
 
+    private fun initObservers() {
+        recipesViewModel!!.recipesDataLive.observe(
+            this,
+            Observer{ recipesData -> recepiesAdapter.recipesContent = recipesData})
     }
 }

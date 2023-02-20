@@ -13,8 +13,10 @@ import com.testtask.myrecipes.presentation.interfaces.RecipesCallbackInterface
 
 const val BASE_URL = "https://hf-android-app.s3-eu-west-1.amazonaws.com/android-test/"
 const val RECIPES_LIST = "recipes.json"
-class RecipeViewModel(): ViewModel() {
-    val recipesDataLive: LiveData<List<SingleRecipe>> = MutableLiveData() // дата основных данных (рецепты)
+
+class RecipeViewModel: ViewModel() {
+    val recipesDataLive: MutableLiveData<List<SingleRecipe>> = MutableLiveData() // дата основных данных (рецепты)
+
     val errorProcessor = ErrorsProcessor() // для вывода ошибок на UI
     val constantsURLSet = URLConstantsSet(baseURL = BASE_URL, recipesList = RECIPES_LIST) // данные для формирования запроса из предсхраненных оций
     var repositoryManager: RecipesRepositoryManager? = null // инстанс класса, отвечающий со всеми отношениями с данынми, памятью, сетью, и т.д.
@@ -22,7 +24,7 @@ class RecipeViewModel(): ViewModel() {
     init {
         val recipesDataCallbackInterface = object: RecipesCallbackInterface{ // интерфейс коллбека результатов
             override fun onGotRecipesData(data: List<SingleRecipe>) {
-                //recipesDataLive.value = data
+                recipesDataLive.value = data
             }
 
         }
