@@ -4,6 +4,7 @@ import android.util.Log
 import com.testtask.myrecipes.data.interfaces.RecipesNetRepositoryInterface
 import com.testtask.myrecipes.data.interfaces.RecipesStorageInterface
 import com.testtask.myrecipes.data.network.*
+import com.testtask.myrecipes.data.network.models.ResponseJsonArray
 import com.testtask.myrecipes.domain.models.SingleRecipe
 import com.testtask.myrecipes.presentation.interfaces.RecipesCallbackInterface
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +29,7 @@ class RecipesRepositoryManager(
         val callbackInterface = object : RecipesNetRepositoryInterface { // коллбек для возврата результата при его получении
             var resultData: List<SingleRecipe>? = null
             override fun onHasResponse(jSonData: JSONArray) { // при получении ответа
-                resultData = parser.parseJson(jSonData!!) // парсим ответ в формат List<SingleRecipe>
+                resultData = parser.parseJson(ResponseJsonArray(jSonData!!)) // парсим ответ в формат List<SingleRecipe>
                 if (resultData == null) noNetData() // если ответа нет
                 else { // если ответ есть
                     if (currentData == null) {
