@@ -24,17 +24,17 @@ class RecipeViewModel: ViewModel() {
     var repositoryManager: RecipesRepositoryManager? = null // инстанс класса, отвечающий со всеми отношениями с данынми, памятью, сетью, и т.д.
 
     init {
-        val recipesDataCallbackInterface = object: RecipesCallbackInterface{ // интерфейс коллбека результатов
+        val recipesDataCallbackInterface = object: RecipesCallbackInterface{ // реализация интерфейса коллбека результатов
             override fun onGotRecipesData(data: List<SingleRecipe>) {
                 // обновляем UI в главном потоке
-                viewModelScope.launch(Dispatchers.Main) { recipesDataLive.value = data }
+                recipesDataLive.postValue(data)
             }
-
         }
+        // создаем инстанс менеджера с учетомм реализации интерфейса коллбека
         repositoryManager = RecipesRepositoryManager(errorProcessor, constantsURLSet, viewModelScope, recipesDataCallbackInterface)
     }
 
     fun updateDataWhenActivityStarted(repositoryStorage: RecipesStorageInterface) {
-        val updatedData = repositoryManager?.updateData(repositoryFromStorage = repositoryStorage)
+        repositoryManager?.updateData(repositoryFromStorage = repositoryStorage)
     }
 }
