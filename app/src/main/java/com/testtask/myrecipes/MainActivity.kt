@@ -2,6 +2,7 @@ package com.testtask.myrecipes
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -43,8 +44,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initObservers() {
-        recipesViewModel!!.recipesDataLive.observe(
+        recipesViewModel!!.publicDataLive.observe(
             this,
-            Observer{ recipesData -> recipesAdapter.recipesContent = recipesData})
+            Observer{ recipesData -> recipesAdapter.recipesContent = recipesData })
     }
 }

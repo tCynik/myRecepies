@@ -10,14 +10,13 @@ import com.testtask.myrecipes.domain.ErrorsProcessor
 import com.testtask.myrecipes.domain.RecipesRepositoryManager
 import com.testtask.myrecipes.domain.models.SingleRecipe
 import com.testtask.myrecipes.presentation.interfaces.RecipesCallbackInterface
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 const val BASE_URL = "https://hf-android-app.s3-eu-west-1.amazonaws.com/android-test/"
 const val RECIPES_LIST = "recipes.json"
 
 class RecipeViewModel: ViewModel() {
-    val recipesDataLive: MutableLiveData<List<SingleRecipe>> = MutableLiveData() // дата основных данных (рецепты)
+    private val recipesDataLive: MutableLiveData<List<SingleRecipe>> = MutableLiveData() // дата основных данных (рецепты)
+    val publicDataLive:  LiveData<List<SingleRecipe>> = recipesDataLive // ливдата для работы обсервера активити
 
     val errorProcessor = ErrorsProcessor() // для вывода ошибок на UI
     val constantsURLSet = URLConstantsSet(baseURL = BASE_URL, recipesList = RECIPES_LIST) // данные для формирования запроса из предсхраненных оций
