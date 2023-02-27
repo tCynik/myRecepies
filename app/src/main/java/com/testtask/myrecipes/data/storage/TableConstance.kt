@@ -1,6 +1,7 @@
 package com.testtask.myrecipes.data.storage
 
 enum class TableConstance {
+    TABLE_RECIPES { override fun value(): String { return "Recipes_list" }},
     KEY_ID { override fun value(): String { return "_id" }},
     KEY_ITEM {override fun value(): String { return "item" }},
     KEY_NAME { override fun value(): String { return "name" }},
