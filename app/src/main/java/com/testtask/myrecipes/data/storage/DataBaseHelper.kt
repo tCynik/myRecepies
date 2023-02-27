@@ -1,5 +1,15 @@
 package com.testtask.myrecipes.data.storage
 
+/**
+ * хелпер для работы с базой данных
+ */
+//todo: константы названий толбцов хранятся в этом месте. В то же время, эти данные нужны в Storage
+// для управления парсингом данных из БД. напрямю эти константы передать невозможно, для создания
+// геттеров потребуетя прописывать эти же геттеры в интерфейсе хелпера, что сильно усложнит
+// тестирование.
+// upd: Пока вынес в enum, подумать, насколько верное решение
+
+
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
@@ -10,46 +20,59 @@ const val DATABASE_NAME = "Recipes_database"
 const val TABLE_RECIPES = "Recipes_list"
 
 // константы заголовков таблицы
-const val KEY_ID = "_id"
-const val KEY_ITEM = "itemId"
-const val KEY_NAME = "name"
-const val KEY_DESCRIPTION = "description"
-const val KEY_HEADLINE = "headline"
-const val KEY_DIFFICULTY = "difficulty"
-const val KEY_CALORIES = "calories"
-const val KEY_FATS = "fats"
-const val KEY_PROTEINS = "proteins"
-const val KEY_CARBOS = "carbos"
-const val KEY_TIME = "time"
-const val KEY_IMAGE_LINK_FULL = "image"
-const val KEY_IMAGE_STORAGE_FULL = "image"
-const val KEY_IMAGE_LINK_PRE = "preimage"
-const val KEY_IMAGE_STORAGE_PRE = "preimage"
+//const val KEY_ID = "_id"
+//const val KEY_ITEM = "itemId"
+//const val KEY_NAME = "name"
+//const val KEY_DESCRIPTION = "description"
+//const val KEY_HEADLINE = "headline"
+//const val KEY_DIFFICULTY = "difficulty"
+//const val KEY_CALORIES = "calories"
+//const val KEY_FATS = "fats"
+//const val KEY_PROTEINS = "proteins"
+//const val KEY_CARBOS = "carbos"
+//const val KEY_TIME = "time"
+//const val KEY_IMAGE_LINK_FULL = "imageLink"
+//const val KEY_IMAGE_STORAGE_FULL = "imageAddress"
+//const val KEY_IMAGE_LINK_PRE = "preimageLink"
+//const val KEY_IMAGE_STORAGE_PRE = "preimageAddress"
 
 class DataBaseHelper( // курсор передаем налловый, название и версию берем из констант
     context: Context?,
 ) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION), HelperInterface {
 
     override fun onCreate(p0: SQLiteDatabase?) { // если таблицы пока нет, создаем и размечаем ее зановоо
-        val tableString: String = ("create table" + TABLE_RECIPES + "(" + KEY_ID + " integer primary key" +
-                "," + KEY_ITEM + " text" +
-                "," + KEY_NAME + " name" +
-                "," + KEY_DESCRIPTION + " text" +
-                "," + KEY_HEADLINE + " text" +
-                "," + KEY_DIFFICULTY + " integer" +
-                "," + KEY_CALORIES + " text" +
-                "," + KEY_PROTEINS + " text" +
-                "," + KEY_CARBOS + " text" +
-                "," + KEY_TIME + " text" +
-                "," + KEY_IMAGE_LINK_FULL + " text" + // net link for download the image
-                "," + KEY_IMAGE_STORAGE_FULL + " text" + // local storage address of the image file
-                "," + KEY_IMAGE_LINK_PRE + " text" +
-                "," + KEY_IMAGE_STORAGE_PRE + " text" + ")")
+        val tableString: String = ("create table $TABLE_RECIPES " +
+                "( ${TableConstance.KEY_ID.value()} integer primary key" +
+                ", ${TableConstance.KEY_ITEM.value()} text" +
+                ", ${TableConstance.KEY_NAME.value()} text" +
+                ", ${TableConstance.KEY_DESCRIPTION.value()} text" +
+                ", ${TableConstance.KEY_HEADLINE.value()} text" +
+                ", ${TableConstance.KEY_DIFFICULTY.value()} integer" +
+                ", ${TableConstance.KEY_CALORIES.value()} text" +
+                ", ${TableConstance.KEY_FATS.value()} text" +
+                ", ${TableConstance.KEY_PROTEINS.value()} text" +
+                ", ${TableConstance.KEY_CARBOS.value()} text" +
+                ", ${TableConstance.KEY_TIME.value()} text" +
+                ", ${TableConstance.KEY_IMAGE_LINK_FULL.value()} text" +
+                ", ${TableConstance.KEY_IMAGE_STORAGE_FULL.value()} text" +
+                ", ${TableConstance.KEY_IMAGE_LINK_PRE.value()} text" +
+                ", ${TableConstance.KEY_IMAGE_STORAGE_PRE.value()} text)")
         p0?.execSQL(tableString)
     }
 
     override fun onUpgrade(p0: SQLiteDatabase?, p1: Int, p2: Int) {
-        TODO("Not yet implemented")
+        val dropCommand = ("drop table if exist + $TABLE_RECIPES")
+        p0?.execSQL(dropCommand)
+
+        onCreate(p0)
+    }
+
+    override fun getWritableDatabase(): SQLiteDatabase {
+        return super.getWritableDatabase()
+    }
+
+    override fun getReadableDatabase(): SQLiteDatabase {
+        return super.getReadableDatabase()
     }
 }
 

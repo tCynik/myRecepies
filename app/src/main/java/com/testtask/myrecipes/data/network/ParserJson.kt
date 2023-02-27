@@ -1,7 +1,6 @@
 package com.testtask.myrecipes.data.network
 
 import android.util.Log
-import com.testtask.myrecipes.data.models.SingleRecipeData
 import com.testtask.myrecipes.data.network.models.ResponseAbstract
 import com.testtask.myrecipes.domain.models.PictureModel
 import com.testtask.myrecipes.domain.models.SingleRecipe

@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.testtask.myrecipes.data.storage.DataBaseHelper
 import com.testtask.myrecipes.data.storage.Storage
 import com.testtask.myrecipes.presentation.RecipesAdapter
 import com.testtask.myrecipes.presentation.RecipeViewModel
@@ -32,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         recipesViewModel = ViewModelProvider(this).get(RecipeViewModel::class.java)
 
         // готовим интерфейсы репозиториев для работы с контекстом при обновлении информации
-        val storageRepository = Storage()
+        val storageRepository = Storage(DataBaseHelper(this))
         // запуск обновления данных
         recipesViewModel!!.updateDataWhenActivityStarted( // инициируем обновление данных
             repositoryStorage = storageRepository)
