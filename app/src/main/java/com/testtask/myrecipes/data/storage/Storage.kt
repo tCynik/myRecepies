@@ -25,10 +25,11 @@ class Storage(val dataBaseHelper: HelperInterface) : RecipesStorageInterface {
         val resultData = mutableListOf<SingleRecipe>()
 
         // перебираем курсор построчно
+        val parser = CursorParser()
         if (cursor.moveToFirst()) { // активизируем первую запись курсора, если она вообще есть
             var isHasNext = true
             while (isHasNext) {
-                resultData.add(parseNextCursorLine(cursor))
+                resultData.add(parser.parse(cursor))
                 if (cursor.moveToNext()) isHasNext = false
             }
             val index = cursor.getColumnIndex(TableConstance.KEY_ID.value())
@@ -37,30 +38,6 @@ class Storage(val dataBaseHelper: HelperInterface) : RecipesStorageInterface {
 
         val db = dataBaseHelper.getReadableDatabase()
         return resultData
-    }
-
-    private fun parseNextCursorLine(cursor: Cursor): SingleRecipe {
-        val full_image = PictureModel(
-            networkAddress = TableConstance.KEY_IMAGE_LINK_FULL.value(),
-            localAddress = TableConstance.KEY_IMAGE_STORAGE_FULL.value() ,
-            null) // todo: организовать подгрузку картинки
-        val pre_image = PictureModel(
-            networkAddress = TableConstance.KEY_IMAGE_LINK_PRE.value(),
-            localAddress = TableConstance.KEY_IMAGE_STORAGE_PRE.value() ,
-            null) // todo: организовать подгрузку картинки
-        return SingleRecipe(
-            id = cursor.getColumnIndex(TableConstance.KEY_ITEM.value()).toString(),
-            name = cursor.getColumnIndex(TableConstance.KEY_NAME.value()).toString(),
-            headline = cursor.getColumnIndex(TableConstance.KEY_HEADLINE.value()).toString(),
-            description = cursor.getColumnIndex(TableConstance.KEY_DESCRIPTION.value()).toString(),
-            difficulty = cursor.getColumnIndex(TableConstance.KEY_DIFFICULTY.value()),
-            calories = cursor.getColumnIndex(TableConstance.KEY_CALORIES.value()).toString(),
-            fats = cursor.getColumnIndex(TableConstance.KEY_FATS.value()).toString(),
-            proteins = cursor.getColumnIndex(TableConstance.KEY_PROTEINS.value()).toString(),
-            carbos = cursor.getColumnIndex(TableConstance.KEY_CARBOS.value()).toString(),
-            cookingTime = cursor.getColumnIndex(TableConstance.KEY_TIME.value()).toString(),
-            full_image = full_image,
-            pre_image = pre_image)
     }
 
     override fun saveRecipesData(recipes: List<SingleRecipe>) {
