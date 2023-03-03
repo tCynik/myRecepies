@@ -19,23 +19,6 @@ const val DATABASE_VERSION = 1
 const val DATABASE_NAME = "Recipes_database"
 const val TABLE_RECIPES = "Recipes_list"
 
-// константы заголовков таблицы
-//const val KEY_ID = "_id"
-//const val KEY_ITEM = "itemId"
-//const val KEY_NAME = "name"
-//const val KEY_DESCRIPTION = "description"
-//const val KEY_HEADLINE = "headline"
-//const val KEY_DIFFICULTY = "difficulty"
-//const val KEY_CALORIES = "calories"
-//const val KEY_FATS = "fats"
-//const val KEY_PROTEINS = "proteins"
-//const val KEY_CARBOS = "carbos"
-//const val KEY_TIME = "time"
-//const val KEY_IMAGE_LINK_FULL = "imageLink"
-//const val KEY_IMAGE_STORAGE_FULL = "imageAddress"
-//const val KEY_IMAGE_LINK_PRE = "preimageLink"
-//const val KEY_IMAGE_STORAGE_PRE = "preimageAddress"
-
 class DataBaseHelper( // курсор передаем налловый, название и версию берем из констант
     context: Context?,
 ) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION), HelperInterface {

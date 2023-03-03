@@ -3,6 +3,7 @@ package com.testtask.myrecipes
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -11,12 +12,22 @@ import com.testtask.myrecipes.data.storage.DataBaseHelper
 import com.testtask.myrecipes.data.storage.Storage
 import com.testtask.myrecipes.presentation.RecipesAdapter
 import com.testtask.myrecipes.presentation.RecipeViewModel
+import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
 
 class MainActivity : AppCompatActivity() {
     var myRecyclerView: RecyclerView? = null
     val recipesAdapter = RecipesAdapter()
     var recipesViewModel: RecipeViewModel? = null
 
+    val logger = object : ToasterAndLogger {
+        override fun printToast(message: String) {
+            makeToast(message)
+        }
+
+        override fun printLog(messge: String) {
+            println(messge)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         recipesViewModel = ViewModelProvider(this).get(RecipeViewModel::class.java)
 
         // готовим интерфейсы репозиториев для работы с контекстом при обновлении информации
-        val storageRepository = Storage(DataBaseHelper(this))
+        val storageRepository = Storage(this, DataBaseHelper(this), logger = logger)
         // запуск обновления данных
         recipesViewModel!!.updateDataWhenActivityStarted( // инициируем обновление данных
             repositoryStorage = storageRepository)
@@ -48,5 +59,9 @@ class MainActivity : AppCompatActivity() {
         recipesViewModel!!.publicDataLive.observe(
             this,
             Observer{ recipesData -> recipesAdapter.recipesContent = recipesData })
+    }
+
+    private fun makeToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 }

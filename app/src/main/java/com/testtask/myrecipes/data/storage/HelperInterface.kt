@@ -7,4 +7,6 @@ import android.database.sqlite.SQLiteDatabase
  */
 interface HelperInterface {
     fun getWritableDatabase(): SQLiteDatabase?
+
+    fun getReadableDatabase(): SQLiteDatabase?
 }

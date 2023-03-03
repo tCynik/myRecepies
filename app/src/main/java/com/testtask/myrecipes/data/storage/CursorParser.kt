@@ -5,13 +5,14 @@ import android.database.Cursor
 import com.testtask.myrecipes.data.storage.image_load_save.ImageLoader
 import com.testtask.myrecipes.domain.models.PictureModel
 import com.testtask.myrecipes.domain.models.SingleRecipe
+import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
 
 /**
  * класс для парсинга результата SQL запроса
  */
 
-class CursorParser(val context: Context) {
-    val imageLoader = ImageLoader(context)
+class CursorParser(val context: Context, logger: ToasterAndLogger) {
+    val imageLoader = ImageLoader(context, logger)
     fun parse(cursor: Cursor): SingleRecipe {
         val idIndex = cursor.getColumnIndex(TableConstance.KEY_ITEM.value())
         val nameIndex = cursor.getColumnIndex(TableConstance.KEY_NAME.value())

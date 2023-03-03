@@ -1,18 +1,18 @@
 package com.testtask.myrecipes.data.storage
 
 import android.content.ContentValues
-import android.database.Cursor
+import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import com.testtask.myrecipes.data.interfaces.RecipesStorageInterface
-import com.testtask.myrecipes.domain.models.PictureModel
 import com.testtask.myrecipes.domain.models.SingleRecipe
+import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
 
 /**
  * класс для работы с внутренней бД
  * Сохранение-загрузка таблицы рецептов происходит с помощью SQLite
  */
 
-class Storage(val dataBaseHelper: HelperInterface) : RecipesStorageInterface {
+class Storage(val context: Context, val dataBaseHelper: HelperInterface, val logger: ToasterAndLogger) : RecipesStorageInterface {
     val tableName = TableConstance.TABLE_RECIPES.value()
     var database: SQLiteDatabase? = null
     init {
@@ -25,7 +25,7 @@ class Storage(val dataBaseHelper: HelperInterface) : RecipesStorageInterface {
         val resultData = mutableListOf<SingleRecipe>()
 
         // перебираем курсор построчно
-        val parser = CursorParser()
+        val parser = CursorParser(context = context, logger = logger)
         if (cursor.moveToFirst()) { // активизируем первую запись курсора, если она вообще есть
             var isHasNext = true
             while (isHasNext) {
@@ -62,5 +62,9 @@ class Storage(val dataBaseHelper: HelperInterface) : RecipesStorageInterface {
         contentValues.put(TableConstance.KEY_IMAGE_STORAGE_PRE.value(), recipe.pre_image.networkAddress)
 
         database!!.insert(tableName, null, contentValues)
+    }
+
+    private fun saveSingleImage() {
+        
     }
 }
