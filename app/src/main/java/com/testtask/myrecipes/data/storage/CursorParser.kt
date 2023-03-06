@@ -10,6 +10,7 @@ import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
 /**
  * класс для парсинга результата SQL запроса
  */
+// todo: сейчас сразу же происходит загрузка фото из сторейджа. Рекомендуется оставить без фотки и организовать загрузку отдельно.
 
 class CursorParser(val context: Context, logger: ToasterAndLogger) {
     val imageLoader = ImageLoader(context, logger)
@@ -46,11 +47,11 @@ class CursorParser(val context: Context, logger: ToasterAndLogger) {
             full_image = PictureModel(
                 networkAddress = cursor.getString(full_imageLinkIndex),
                 localAddress = fullImageAddress,
-                image = imageLoader.loadImage(fullImageAddress)),
+                image = imageLoader.loadImageByRecipeName(fullImageAddress)),
             pre_image = PictureModel(
                 networkAddress = cursor.getString(pre_imageLinkIndex),
                 localAddress = preImageAddress,
-                image = imageLoader.loadImage(preImageAddress))
+                image = imageLoader.loadImageByRecipeName(preImageAddress))
         )
     }
 }

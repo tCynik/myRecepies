@@ -4,13 +4,12 @@ import android.util.Log
 import com.testtask.myrecipes.data.network.models.ResponseAbstract
 import com.testtask.myrecipes.domain.models.PictureModel
 import com.testtask.myrecipes.domain.models.SingleRecipe
-import org.json.JSONArray
 import org.json.JSONException
-import java.lang.Exception
 
 /**
  * Класс отвечает за парсинг ответа в формате JSONArray в промежуточную модель SingleRecipeData
  */
+private const val noLocalImagePattern = "EMPTY"
 class ParserJson {
 
     fun parseJson(responseToParsing: ResponseAbstract): List<SingleRecipe> {
@@ -34,8 +33,8 @@ class ParserJson {
                     proteins = currentItem.getString("proteins"),
                     carbos = currentItem.getString("carbos"),
                     cookingTime = currentItem.getString("time"),
-                    full_image = PictureModel(currentItem.getString("image"), "", null) ,
-                    pre_image = PictureModel(currentItem.getString("thumb"), "", null))
+                    full_image = PictureModel(currentItem.getString("image"), noLocalImagePattern, null) ,
+                    pre_image = PictureModel(currentItem.getString("thumb"), noLocalImagePattern, null))
                 )
             } catch (e: JSONException) {
                 Log.i("bugfix: parser ", "parsing exception occurred $e")

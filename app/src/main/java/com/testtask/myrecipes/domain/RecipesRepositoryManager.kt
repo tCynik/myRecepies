@@ -29,13 +29,28 @@ class RecipesRepositoryManager(
         val callbackInterface = object : RecipesNetRepositoryInterface { // коллбек для возврата результата при его получении
             var resultData: List<SingleRecipe>? = null
             override fun onHasResponse(jSonData: JSONArray) { // при получении ответа
-                resultData = parser.parseJson(ResponseJsonArray(jSonData!!)) // парсим ответ в формат List<SingleRecipe>
+                resultData = parser.parseJson(ResponseJsonArray(jSonData)) // парсим ответ в формат List<SingleRecipe>
                 if (resultData == null) noNetData() // если ответа нет
                 else { // если ответ есть
                     if (currentData == null) {
-                        currentData = resultData
+                        currentData = resultData // сохраняем значения в инстнс сессии
                         recipesDataCallbackInterface.onGotRecipesData(resultData!!)
                     }
+                    // todo: для начала работаем по сторейджу только с фотками, по без дате рецептов не работаем пока
+                    currentData!!.forEach { // todo: потом перенести в отдельный класс ImagesDataDirector?
+                        recipe -> if (recipe.full_image.localAddress == "EMPTY") {
+                            val address = recipe.full_image.networkAddress
+                        // асинхронно качаем фотку из сети
+                        } else {
+                            val address = recipe.full_image.localAddress
+                            // асинхронно качаем фотку с локального адреса
+                        }
+                    }
+                    // берем полученную дату, проверяем есть ли фотки. Если фотка есть, беремм ее
+                // из памяти, вставляем в ячейку даты, обновляем дату (пока что всю, только потом
+                // построчно сделаем). Если фотки нет - асинхронно качаем ее, сохраняем в сторейдж,
+                // и опять обновляем дату во ВМ.
+
                 }
             }
         }
