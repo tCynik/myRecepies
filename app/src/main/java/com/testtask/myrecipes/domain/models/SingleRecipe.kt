@@ -6,7 +6,7 @@ import android.graphics.drawable.Drawable
  * Модель отвечающая за хранение данных каждого отдельного рецепта
  */
 data class SingleRecipe(
-    val id: String,
+    val id: String, // этот айдишник берётся в качестве имя файла для сохранения картинок, +_full / +_pre в зависимости от типа картинки
     val name: String,
     val description: String,
     val headline: String,

@@ -9,7 +9,7 @@ import org.json.JSONException
 /**
  * Класс отвечает за парсинг ответа в формате JSONArray в промежуточную модель SingleRecipeData
  */
-private const val noLocalImagePattern = "EMPTY"
+private const val NO_LOCAL_IMAGE_PATTERN = "EMPTY"
 class ParserJson {
 
     fun parseJson(responseToParsing: ResponseAbstract): List<SingleRecipe> {
@@ -33,8 +33,8 @@ class ParserJson {
                     proteins = currentItem.getString("proteins"),
                     carbos = currentItem.getString("carbos"),
                     cookingTime = currentItem.getString("time"),
-                    full_image = PictureModel(currentItem.getString("image"), noLocalImagePattern, null) ,
-                    pre_image = PictureModel(currentItem.getString("thumb"), noLocalImagePattern, null))
+                    full_image = PictureModel(currentItem.getString("image"), NO_LOCAL_IMAGE_PATTERN, null) ,
+                    pre_image = PictureModel(currentItem.getString("thumb"), NO_LOCAL_IMAGE_PATTERN, null))
                 )
             } catch (e: JSONException) {
                 Log.i("bugfix: parser ", "parsing exception occurred $e")

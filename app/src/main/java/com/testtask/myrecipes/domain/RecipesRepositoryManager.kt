@@ -5,6 +5,7 @@ import com.testtask.myrecipes.data.interfaces.RecipesNetRepositoryInterface
 import com.testtask.myrecipes.data.interfaces.RecipesStorageInterface
 import com.testtask.myrecipes.data.network.*
 import com.testtask.myrecipes.data.network.models.ResponseJsonArray
+import com.testtask.myrecipes.domain.interfaces.ImageDownloadingCallback
 import com.testtask.myrecipes.domain.models.SingleRecipe
 import com.testtask.myrecipes.presentation.interfaces.RecipesCallbackInterface
 import kotlinx.coroutines.CoroutineScope
@@ -21,10 +22,18 @@ class RecipesRepositoryManager(
     private val scope: CoroutineScope,
     private val recipesDataCallbackInterface: RecipesCallbackInterface
                         ) {
-    private var currentData: List<SingleRecipe>? = null // текущие данные, согласно последнему обновлению
+    private var currentData: MutableList<SingleRecipe>? = null // текущие данные, согласно последнему обновлению
 
     private val parser = ParserJson() // парсинг ответа из JSONArray
     private var requestMaker: RecipesRequestMaker? = null // инстанс, отвечающий за формирование запроса
+    
+    private val imagesDataDirector = ImagesDataDirector(
+        imageCallback = getImageCallback(),
+        scope = scope,
+        imageLoader = ,
+        imageSager = ,
+        imageDownloader = )
+
     init {
         val callbackInterface = object : RecipesNetRepositoryInterface { // коллбек для возврата результата при его получении
             var resultData: List<SingleRecipe>? = null
@@ -36,21 +45,9 @@ class RecipesRepositoryManager(
                         currentData = resultData // сохраняем значения в инстнс сессии
                         recipesDataCallbackInterface.onGotRecipesData(resultData!!)
                     }
-                    // todo: для начала работаем по сторейджу только с фотками, по без дате рецептов не работаем пока
-                    currentData!!.forEach { // todo: потом перенести в отдельный класс ImagesDataDirector?
-                        recipe -> if (recipe.full_image.localAddress == "EMPTY") {
-                            val address = recipe.full_image.networkAddress
-                        // асинхронно качаем фотку из сети
-                        } else {
-                            val address = recipe.full_image.localAddress
-                            // асинхронно качаем фотку с локального адреса
-                        }
+                    currentData!!.forEach { recipe ->
+                        imagesDataDirector.getImage(recipe = recipe, isFull = false)
                     }
-                    // берем полученную дату, проверяем есть ли фотки. Если фотка есть, беремм ее
-                // из памяти, вставляем в ячейку даты, обновляем дату (пока что всю, только потом
-                // построчно сделаем). Если фотки нет - асинхронно качаем ее, сохраняем в сторейдж,
-                // и опять обновляем дату во ВМ.
-
                 }
             }
         }
@@ -75,6 +72,20 @@ class RecipesRepositoryManager(
 
     private fun updateDataFromStorage(repository: RecipesStorageInterface){
 
+    }
+
+    private fun getImageCallback(): ImageDownloadingCallback {
+        return object: ImageDownloadingCallback { // коллбек для обновления даты при получении изображения.
+            override fun updateRecipeItem(recipe: SingleRecipe) {
+                // todo: каждый раз вызывает notifyDataSetChanged() - оптимизировать на notifyItemSetChanged()
+                var i = 0
+                while (i < currentData!!.size) {
+                    if (recipe.id != currentData!![i].id) {
+                        currentData!![i] = recipe
+                    }
+                }
+            }
+        }
     }
 
     private fun noNetData(){// вызывается для отбаботки ошибок и отправки сообщений
