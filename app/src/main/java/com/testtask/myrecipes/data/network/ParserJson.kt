@@ -12,7 +12,7 @@ import org.json.JSONException
 private const val NO_LOCAL_IMAGE_PATTERN = "EMPTY"
 class ParserJson {
 
-    fun parseJson(responseToParsing: ResponseAbstract): List<SingleRecipe> {
+    fun parseJson(responseToParsing: ResponseAbstract): MutableList<SingleRecipe> {
         val dataJsonArray = responseToParsing.getData()!!
         val result = mutableListOf<SingleRecipe>()
 

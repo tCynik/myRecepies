@@ -4,6 +4,6 @@ import android.graphics.drawable.Drawable
 
 class ImageDownloader {
     fun downloadPicture (addressURL: String): Drawable? {
-
+        
     }
 }

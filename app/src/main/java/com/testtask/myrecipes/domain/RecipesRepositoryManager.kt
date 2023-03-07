@@ -4,7 +4,10 @@ import android.util.Log
 import com.testtask.myrecipes.data.interfaces.RecipesNetRepositoryInterface
 import com.testtask.myrecipes.data.interfaces.RecipesStorageInterface
 import com.testtask.myrecipes.data.network.*
+import com.testtask.myrecipes.data.network.models.ImageDownloader
 import com.testtask.myrecipes.data.network.models.ResponseJsonArray
+import com.testtask.myrecipes.data.storage.image_load_save.ImageLoader
+import com.testtask.myrecipes.data.storage.image_load_save.ImageSaver
 import com.testtask.myrecipes.domain.interfaces.ImageDownloadingCallback
 import com.testtask.myrecipes.domain.models.SingleRecipe
 import com.testtask.myrecipes.presentation.interfaces.RecipesCallbackInterface
@@ -19,24 +22,27 @@ import org.json.JSONArray
 class RecipesRepositoryManager(
     private val errorsProcessor: ErrorsProcessor,
     private val constantsURLSet: URLConstantsSet,
-    private val scope: CoroutineScope,
-    private val recipesDataCallbackInterface: RecipesCallbackInterface
+    scope: CoroutineScope,
+    private val recipesDataCallbackInterface: RecipesCallbackInterface,
+    imageLoader: ImageLoader, // todo: reset with interface!
+    imageSaver: ImageSaver, // todo: reset with interface!
+    imageDownloader: ImageDownloader // todo: reset with interface!
                         ) {
     private var currentData: MutableList<SingleRecipe>? = null // текущие данные, согласно последнему обновлению
 
     private val parser = ParserJson() // парсинг ответа из JSONArray
     private var requestMaker: RecipesRequestMaker? = null // инстанс, отвечающий за формирование запроса
-    
+
     private val imagesDataDirector = ImagesDataDirector(
         imageCallback = getImageCallback(),
         scope = scope,
-        imageLoader = ,
-        imageSager = ,
-        imageDownloader = )
+        imageLoader = imageLoader,
+        imageSager = imageSaver,
+        imageDownloader = imageDownloader)
 
     init {
         val callbackInterface = object : RecipesNetRepositoryInterface { // коллбек для возврата результата при его получении
-            var resultData: List<SingleRecipe>? = null
+            var resultData: MutableList<SingleRecipe>? = null
             override fun onHasResponse(jSonData: JSONArray) { // при получении ответа
                 resultData = parser.parseJson(ResponseJsonArray(jSonData)) // парсим ответ в формат List<SingleRecipe>
                 if (resultData == null) noNetData() // если ответа нет
