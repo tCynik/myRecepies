@@ -2,14 +2,17 @@ package com.testtask.myrecipes
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.testtask.myrecipes.data.network.ImageDownloader
 import com.testtask.myrecipes.data.storage.DataBaseHelper
 import com.testtask.myrecipes.data.storage.Storage
+import com.testtask.myrecipes.data.storage.image_load_save.ImageLoader
+import com.testtask.myrecipes.data.storage.image_load_save.ImageSaver
+import com.testtask.myrecipes.domain.ErrorsProcessor
 import com.testtask.myrecipes.presentation.RecipesAdapter
 import com.testtask.myrecipes.presentation.RecipeViewModel
 import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
@@ -45,9 +48,19 @@ class MainActivity : AppCompatActivity() {
 
         // готовим интерфейсы репозиториев для работы с контекстом при обновлении информации
         val storageRepository = Storage(this, DataBaseHelper(this), logger = logger)
+        // передаем зависимости во ВМ
+        val errorProcessor = ErrorsProcessor()
+        val imageDownloader = ImageDownloader(errorProcessor)
+        val imageLoader = ImageLoader(this, logger)
+        val imageSaver = ImageSaver(this, logger)
+
+        recipesViewModel!!.initRepositoryManager(imageDownloader = imageDownloader, imageLoader = imageLoader, imageSaver = imageSaver)
+
         // запуск обновления данных
-        recipesViewModel!!.updateDataWhenActivityStarted( // инициируем обновление данных
+        recipesViewModel!!.updateDataWhenActivityCreated( // инициируем обновление данных
             repositoryStorage = storageRepository)
+        // todo: обновление запускается автоматически при onCreate. При перевороте экрана так же будет обновляться, а это не нужно
+
     }
 
     override fun onStart() {
