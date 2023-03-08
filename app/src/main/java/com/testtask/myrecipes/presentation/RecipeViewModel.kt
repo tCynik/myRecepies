@@ -30,7 +30,14 @@ class RecipeViewModel: ViewModel() {
             }
         }
         // создаем инстанс менеджера с учетомм реализации интерфейса коллбека
-        repositoryManager = RecipesRepositoryManager(errorProcessor, constantsURLSet, viewModelScope, recipesDataCallbackInterface)
+        repositoryManager = RecipesRepositoryManager(
+            errorsProcessor = errorProcessor,
+            constantsURLSet = constantsURLSet,
+            scope = viewModelScope,
+            recipesDataCallbackInterface = recipesDataCallbackInterface,
+            imageDownloader =,
+            imageLoader = ,
+            imageSaver =  )
     }
 
     fun updateDataWhenActivityStarted(repositoryStorage: RecipesStorageInterface) {

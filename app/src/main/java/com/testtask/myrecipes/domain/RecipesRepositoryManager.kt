@@ -4,7 +4,7 @@ import android.util.Log
 import com.testtask.myrecipes.data.interfaces.RecipesNetRepositoryInterface
 import com.testtask.myrecipes.data.interfaces.RecipesStorageInterface
 import com.testtask.myrecipes.data.network.*
-import com.testtask.myrecipes.data.network.models.ImageDownloader
+import com.testtask.myrecipes.data.network.ImageDownloader
 import com.testtask.myrecipes.data.network.models.ResponseJsonArray
 import com.testtask.myrecipes.data.storage.image_load_save.ImageLoader
 import com.testtask.myrecipes.data.storage.image_load_save.ImageSaver

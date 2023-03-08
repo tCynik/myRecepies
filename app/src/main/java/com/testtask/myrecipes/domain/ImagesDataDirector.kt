@@ -1,7 +1,7 @@
 package com.testtask.myrecipes.domain
 
 import android.graphics.drawable.Drawable
-import com.testtask.myrecipes.data.network.models.ImageDownloader
+import com.testtask.myrecipes.data.network.ImageDownloader
 import com.testtask.myrecipes.data.storage.image_load_save.ImageLoader
 import com.testtask.myrecipes.data.storage.image_load_save.ImageSaver
 import com.testtask.myrecipes.domain.interfaces.ImageDownloadingCallback
@@ -30,7 +30,8 @@ class ImagesDataDirector(
     val scope: CoroutineScope,
     val imageLoader: ImageLoader,
     val imageSager: ImageSaver,
-    val imageDownloader: ImageDownloader) { // todo: Injection: interface with callback of recipe with photos; storages
+    val imageDownloader: ImageDownloader
+) { // todo: Injection: interface with callback of recipe with photos; storages
 
     fun getImage(recipe: SingleRecipe, isFull: Boolean) {
         var localAddress = ""
@@ -46,13 +47,13 @@ class ImagesDataDirector(
         // асинхронно качаем фотку
         scope.launch(Dispatchers.Default) {
             var picture: Drawable? = null
+            var fileName = recipe.id // будущее имя файла
             var resultRecipe: SingleRecipe? = null
             if (localAddress == NO_LOCAL_IMAGE_PATTERN) { // если локальной фотки нет, качаем ее из сети
-                picture = imageDownloader.downloadPicture(networkAddress) // качаем фото из сети
+                picture = imageDownloader.downloadPicture(networkAddress, fileName) // качаем фото из сети
                 if (picture != null) {
                     // сохраняем фото в память
-                    var fileName = recipe.id // формируем будущий адрес сохранения
-                    fileName = if (isFull) fileName + "_full"
+                    fileName = if (isFull) fileName + "_full" // формируем будущий адрес сохранения
                     else fileName + "_pre"
 
                     // сохраняем
