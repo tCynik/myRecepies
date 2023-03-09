@@ -1,6 +1,7 @@
 package com.testtask.myrecipes.domain
 
 import android.graphics.drawable.Drawable
+import android.util.Log
 import com.testtask.myrecipes.data.network.ImageDownloader
 import com.testtask.myrecipes.data.storage.image_load_save.ImageLoader
 import com.testtask.myrecipes.data.storage.image_load_save.ImageSaver
@@ -34,6 +35,7 @@ class ImagesDataDirector(
 ) { // todo: Injection: interface with callback of recipe with photos; storages
 
     fun getImage(recipe: SingleRecipe, isFull: Boolean) {
+        Log.i("bugfix:imagesDataDirector", "searching photo for ${recipe.id}")
         var localAddress = ""
         var networkAddress = ""
         if (isFull) {
@@ -52,6 +54,7 @@ class ImagesDataDirector(
             if (localAddress == NO_LOCAL_IMAGE_PATTERN) { // если локальной фотки нет, качаем ее из сети
                 picture = imageDownloader.downloadPicture(networkAddress, fileName) // качаем фото из сети
                 if (picture != null) {
+                    Log.i("bugfix:imagesDataDirector", "no local image for $fileName")
                     // сохраняем фото в память
                     fileName = if (isFull) fileName + "_full" // формируем будущий адрес сохранения
                     else fileName + "_pre"
@@ -66,6 +69,7 @@ class ImagesDataDirector(
                             isFull = isFull) }
                 }
             } else { // если локальная есть, берем из памяти
+                Log.i("bugfix:imagesDataDirector", "got local image for $fileName")
                 picture = imageLoader.loadImageByAddress(localAddress)
                 val localAddress = if (isFull) recipe.full_image.localAddress
                 else recipe.pre_image.localAddress
@@ -76,6 +80,7 @@ class ImagesDataDirector(
                     localAddress = localAddress,
                     isFull = isFull) }
             }
+            Log.i("bugfix:imagesDataDirector", "making callback for $fileName")
             imageCallback.updateRecipeItem(resultRecipe!!)
         }
     }

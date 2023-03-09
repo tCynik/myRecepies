@@ -1,6 +1,7 @@
 package com.testtask.myrecipes.data.network
 
 import android.graphics.drawable.Drawable
+import android.util.Log
 import com.testtask.myrecipes.domain.ErrorsProcessor
 import java.io.IOException
 import java.net.HttpURLConnection
@@ -9,6 +10,7 @@ import java.net.URL
 
 class ImageDownloader(val errorsProcessor: ErrorsProcessor) {
     fun downloadPicture (addressURL: String, fileName: String): Drawable? {
+        Log.i("bugfix: imageDownloader", "downloading the image from: $addressURL")
         try {
             // создаем соединение
             val url = URL(addressURL)

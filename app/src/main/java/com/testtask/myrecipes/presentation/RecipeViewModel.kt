@@ -67,7 +67,7 @@ class RecipeViewModel: ViewModel() {
     }
 
     fun updateDataWhenActivityCreated(repositoryStorage: RecipesStorageInterface) {
-        if (recipesDataLive.value!!.isEmpty())
+        if (recipesDataLive.value == null)
             repositoryManager?.updateData(repositoryFromStorage = repositoryStorage)
     }
 }

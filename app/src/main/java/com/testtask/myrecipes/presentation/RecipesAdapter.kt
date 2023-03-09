@@ -1,5 +1,6 @@
 package com.testtask.myrecipes.presentation
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,8 +44,11 @@ class RecipesAdapter: RecyclerView.Adapter<RecipesAdapter.MyViewHolder>() {
         }
 
         private fun placePhoto(pre_image: PictureModel) {
-            if (pre_image.image != null)
+            if (pre_image.image != null) {
                 imagePlace.setImageDrawable(pre_image.image)
+                Log.i("bugfix: recipesAdapter", "got image, posting one")
+            }
+            else Log.i("bugfix: recipesAdapter", "no image")
         }
     }
 
