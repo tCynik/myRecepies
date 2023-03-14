@@ -86,7 +86,7 @@ class RecipesRepositoryManager(
                 // todo: каждый раз вызывает notifyDataSetChanged() - оптимизировать на notifyItemSetChanged()
                 var i = 0
                 while (i < currentData!!.size) { // перебираем имеющийся массив даты в поисках рецепта с таким же ID
-                    if (recipe.id != currentData!![i].id) {
+                    if (recipe.id == currentData!![i].id) {
                         Log.i("bugfix: recipesManager", "setting ${recipe.id} to ${currentData!![i].id} with photo = ${recipe.pre_image.image != null}")
                         currentData!![i] = recipe
                         i++
