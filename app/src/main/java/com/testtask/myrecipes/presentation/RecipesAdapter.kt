@@ -46,9 +46,7 @@ class RecipesAdapter: RecyclerView.Adapter<RecipesAdapter.MyViewHolder>() {
         private fun placePhoto(pre_image: PictureModel) {
             if (pre_image.image != null) {
                 imagePlace.setImageDrawable(pre_image.image)
-                Log.i("bugfix: recipesAdapter", "got image, posting one")
             }
-            else Log.i("bugfix: recipesAdapter", "no image")
         }
     }
 

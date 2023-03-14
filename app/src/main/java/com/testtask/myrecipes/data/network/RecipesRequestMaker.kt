@@ -48,7 +48,7 @@ class RecipesRequestMaker(
 
         try{
             connection.connect()
-            Log.i("bugfix: recipesRequestRepo", "connected code - ${connection.responseCode}")
+            Log.i("bugfix: recipesRequestMaker", "connected code - ${connection.responseCode}")
             // todo: switch to logger
 
             if (connection.responseCode == 200)

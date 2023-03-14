@@ -1,5 +1,6 @@
 package com.testtask.myrecipes.domain
 
+import android.graphics.drawable.Drawable
 import android.util.Log
 import com.testtask.myrecipes.data.interfaces.RecipesNetRepositoryInterface
 import com.testtask.myrecipes.data.interfaces.RecipesStorageInterface
@@ -11,7 +12,7 @@ import com.testtask.myrecipes.data.storage.image_load_save.ImageSaver
 import com.testtask.myrecipes.domain.interfaces.ImageDownloadingCallback
 import com.testtask.myrecipes.domain.models.SingleRecipe
 import com.testtask.myrecipes.presentation.interfaces.RecipesCallbackInterface
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import org.json.JSONArray
 
 /**
@@ -22,11 +23,11 @@ import org.json.JSONArray
 class RecipesRepositoryManager(
     private val errorsProcessor: ErrorsProcessor,
     private val constantsURLSet: URLConstantsSet,
-    scope: CoroutineScope,
+    val scope: CoroutineScope,
     private val recipesDataCallbackInterface: RecipesCallbackInterface,
-    imageLoader: ImageLoader, // todo: reset with interface!
-    imageSaver: ImageSaver, // todo: reset with interface!
-    imageDownloader: ImageDownloader // todo: reset with interface!
+    val imageLoader: ImageLoader, // todo: reset with interface!
+    val imageSaver: ImageSaver, // todo: reset with interface!
+    val imageDownloader: ImageDownloader // todo: reset with interface!
                         ) {
     private var currentData: MutableList<SingleRecipe>? = null // текущие данные, согласно последнему обновлению
 
@@ -35,7 +36,6 @@ class RecipesRepositoryManager(
 
     private val imagesDataDirector = ImagesDataDirector(
         imageCallback = getImageCallback(),
-        scope = scope,
         imageLoader = imageLoader,
         imageSager = imageSaver,
         imageDownloader = imageDownloader)
@@ -49,10 +49,11 @@ class RecipesRepositoryManager(
                 else { // если ответ есть
                     if (currentData == null) {
                         currentData = resultData // сохраняем значения в инстнс сессии
-                        recipesDataCallbackInterface.onGotRecipesData(resultData!!)
+                        recipesDataCallbackInterface.onGotRecipesData(resultData!!) // отправляем во ВМ коллбек с результатом
                     }
-                    currentData!!.forEach { recipe ->
-                        imagesDataDirector.getImage(recipe = recipe, isFull = false)
+                    Log.i("bugfix: RepoManager", "got result size: ${currentData!!.size}")
+                    for (i in 0 until currentData!!.size) {
+                        scope.async (Dispatchers.IO) {imagesDataDirector.getImage(recipe = currentData!![i], isFull = false)}
                     }
                 }
             }
@@ -62,8 +63,7 @@ class RecipesRepositoryManager(
     }
 
     // по получаемому из активити репозиториям отрабатываем варианты загрузки
-    fun updateData(
-        repositoryFromStorage: RecipesStorageInterface // для работы с контекстом передаем сюда storage для загрузки из памяти
+    fun updateData(repositoryFromStorage: RecipesStorageInterface // для работы с контекстом передаем сюда storage для загрузки из памяти
     ): List<SingleRecipe> {
         // todo: сначала обращаемся к storage и качаем дату из памяти потом обращаемся в интернет.
         //  Когда приходит ответ из сети и если он отличается от информации из памяти, обновляем даныне
@@ -85,11 +85,14 @@ class RecipesRepositoryManager(
             override fun updateRecipeItem(recipe: SingleRecipe) {
                 // todo: каждый раз вызывает notifyDataSetChanged() - оптимизировать на notifyItemSetChanged()
                 var i = 0
-                while (i < currentData!!.size) {
+                while (i < currentData!!.size) { // перебираем имеющийся массив даты в поисках рецепта с таким же ID
                     if (recipe.id != currentData!![i].id) {
+                        Log.i("bugfix: recipesManager", "setting ${recipe.id} to ${currentData!![i].id} with photo = ${recipe.pre_image.image != null}")
                         currentData!![i] = recipe
+                        i++
                     }
                 }
+                recipesDataCallbackInterface.onGotRecipesData(currentData as List<SingleRecipe>)
             }
         }
     }

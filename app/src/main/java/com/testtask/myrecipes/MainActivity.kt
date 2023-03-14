@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.testtask.myrecipes.data.network.ImageDownloader
@@ -50,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         val storageRepository = Storage(this, DataBaseHelper(this), logger = logger)
         // передаем зависимости во ВМ
         val errorProcessor = ErrorsProcessor()
-        val imageDownloader = ImageDownloader(errorProcessor)
+        val imageDownloader = ImageDownloader(errorProcessor, recipesViewModel!!.viewModelScope)
         val imageLoader = ImageLoader(this, logger)
         val imageSaver = ImageSaver(this, logger)
 
