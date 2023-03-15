@@ -14,6 +14,7 @@ import com.testtask.myrecipes.domain.models.SingleRecipe
 import com.testtask.myrecipes.presentation.interfaces.RecipesCallbackInterface
 import kotlinx.coroutines.*
 import org.json.JSONArray
+import java.util.*
 
 /**
  * Класс, ответственный за упарвлением получением данных. Он решает, какие запросы направлять
@@ -29,7 +30,7 @@ class RecipesRepositoryManager(
     val imageSaver: ImageSaver, // todo: reset with interface!
     val imageDownloader: ImageDownloader // todo: reset with interface!
                         ) {
-    private var currentData: MutableList<SingleRecipe>? = null // текущие данные, согласно последнему обновлению
+    private var currentData: SortedMap<String, SingleRecipe>? = null // текущие данные, согласно последнему обновлению
 
     private val parser = ParserJson() // парсинг ответа из JSONArray
     private var requestMaker: RecipesRequestMaker? = null // инстанс, отвечающий за формирование запроса
@@ -42,7 +43,7 @@ class RecipesRepositoryManager(
 
     init {
         val callbackInterface = object : RecipesNetRepositoryInterface { // коллбек для возврата результата при его получении
-            var resultData: MutableList<SingleRecipe>? = null
+            var resultData: SortedMap<String, SingleRecipe>? = null
             override fun onHasResponse(jSonData: JSONArray) { // при получении ответа
                 resultData = parser.parseJson(ResponseJsonArray(jSonData)) // парсим ответ в формат List<SingleRecipe>
                 if (resultData == null) noNetData() // если ответа нет
@@ -52,9 +53,15 @@ class RecipesRepositoryManager(
                         recipesDataCallbackInterface.onGotRecipesData(resultData!!) // отправляем во ВМ коллбек с результатом
                     }
                     Log.i("bugfix: RepoManager", "got result size: ${currentData!!.size}")
-                    for (i in 0 until currentData!!.size) {
-                        scope.async (Dispatchers.IO) {imagesDataDirector.getImage(recipe = currentData!![i], isFull = false)}
+
+                    val iterator = currentData!!.iterator()
+                    while (iterator.hasNext()) {
+                        scope.async (Dispatchers.IO) {imagesDataDirector.getImage(recipe = iterator.next().value, isFull = false)}
                     }
+//                    currentData!!.forEach { id, recipe -> scope.async (Dispatchers.IO) {imagesDataDirector.getImage(recipe = recipe, isFull = false)}}
+//                    for (i in 0 until currentData!!.size) {
+//                        scope.async (Dispatchers.IO) {imagesDataDirector.getImage(recipe = currentData!![i], isFull = false)}
+//                    }
                 }
             }
         }
@@ -84,15 +91,17 @@ class RecipesRepositoryManager(
         return object: ImageDownloadingCallback { // коллбек для обновления даты при получении изображения.
             override fun updateRecipeItem(recipe: SingleRecipe) {
                 // todo: каждый раз вызывает notifyDataSetChanged() - оптимизировать на notifyItemSetChanged()
-                var i = 0
-                while (i < currentData!!.size) { // перебираем имеющийся массив даты в поисках рецепта с таким же ID
-                    if (recipe.id == currentData!![i].id) {
-                        Log.i("bugfix: recipesManager", "setting ${recipe.id} to ${currentData!![i].id} with photo = ${recipe.pre_image.image != null}")
-                        currentData!![i] = recipe
-                        i++
-                    }
-                }
-                recipesDataCallbackInterface.onGotRecipesData(currentData as List<SingleRecipe>)
+                if (currentData!!.containsKey(recipe.id))
+                    currentData!![recipe.id] = recipe
+//                var i = 0
+//                while (i < currentData!!.size) { // перебираем имеющийся массив даты в поисках рецепта с таким же ID
+//                    if (recipe.id == currentData!![i].id) {
+//                        Log.i("bugfix: recipesManager", "setting ${recipe.id} to ${currentData!![i].id} with photo = ${recipe.pre_image.image != null}")
+//                        currentData!![i] = recipe
+//                        i++
+//                    }
+//                }
+                recipesDataCallbackInterface.onGotRecipesData(currentData!!)
             }
         }
     }

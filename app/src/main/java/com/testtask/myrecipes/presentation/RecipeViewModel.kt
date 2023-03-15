@@ -1,5 +1,6 @@
 package com.testtask.myrecipes.presentation
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,6 +14,7 @@ import com.testtask.myrecipes.domain.ErrorsProcessor
 import com.testtask.myrecipes.domain.RecipesRepositoryManager
 import com.testtask.myrecipes.domain.models.SingleRecipe
 import com.testtask.myrecipes.presentation.interfaces.RecipesCallbackInterface
+import java.util.*
 
 const val BASE_URL = "https://hf-android-app.s3-eu-west-1.amazonaws.com/android-test/"
 const val RECIPES_LIST = "recipes.json"
@@ -49,9 +51,13 @@ class RecipeViewModel: ViewModel() {
         imageLoader: ImageLoader,
         imageSaver: ImageSaver) {
         val recipesDataCallbackInterface = object: RecipesCallbackInterface{ // реализация интерфейса коллбека результатов
-            override fun onGotRecipesData(data: List<SingleRecipe>) {
+            override fun onGotRecipesData(data: SortedMap<String, SingleRecipe>) {
                 // обновляем UI в главном потоке
-                recipesDataLive.postValue(data)
+
+                val listData: List<SingleRecipe> = data.values.toList()
+                Log.i("bugfix: ViewModel", "!posting the value")
+                recipesDataLive.postValue(listData)
+                Log.i("bugfix: ViewModel", "!after posting the value")
             }
         }
 
