@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.util.Log
 import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
 import java.io.File
 import java.io.FileOutputStream
@@ -20,6 +21,7 @@ private const val NO_LOCAL_IMAGE_PATTERN = "EMPTY"
 
 class ImageSaver(val contextActivity: Context, val logger: ToasterAndLogger) {
     fun saveImage(image: Drawable, fileName: String): String {
+
         val bitmap = (image as? BitmapDrawable)?.bitmap ?: return NO_LOCAL_IMAGE_PATTERN // преобразование Drawable в Bitmap
 
         val outputStream: OutputStream? // открываем поток для записи в файл
@@ -31,12 +33,14 @@ class ImageSaver(val contextActivity: Context, val logger: ToasterAndLogger) {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream) // сжатие битмапа в .png
             outputStream.flush()
             outputStream.close()
+            Log.i("bugfix: ImageSaver", "image $fileName saved successfully")
             return fileAddress
         } catch (e: IOException) {
             logger.printToast("image saving IOException: $e")
             logger.printLog("Image server: image saving IOException: $e")
         }
 
+        Log.i("bugfix: ImageSaver", "image $fileName saving failed")
         return NO_LOCAL_IMAGE_PATTERN // запись не удалась
     }
 }

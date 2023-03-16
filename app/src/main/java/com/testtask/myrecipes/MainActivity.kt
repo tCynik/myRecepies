@@ -58,8 +58,7 @@ class MainActivity : AppCompatActivity() {
         recipesViewModel!!.initRepositoryManager(imageDownloader = imageDownloader, imageLoader = imageLoader, imageSaver = imageSaver)
 
         // запуск обновления данных
-        recipesViewModel!!.updateDataWhenActivityCreated( // инициируем обновление данных
-            repositoryStorage = storageRepository)
+        recipesViewModel!!.updateDataWhenActivityCreated() // инициируем обновление данных
         // todo: обновление запускается автоматически при onCreate. При перевороте экрана так же будет обновляться, а это не нужно
 
     }

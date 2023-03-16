@@ -41,7 +41,6 @@ class ImagesDataDirector(
             localAddress = recipe.pre_image.localAddress
             networkAddress = recipe.pre_image.networkAddress
         }
-        Log.i("bugfix:imagesDataDirector", "searching photo for ${recipe.id} by ${networkAddress}")
 
         val picture: Drawable?
         var fileName = recipe.id // будущее имя файла
@@ -49,12 +48,8 @@ class ImagesDataDirector(
 
         if (localAddress == NO_LOCAL_IMAGE_PATTERN) { // если локальной фотки нет, качаем ее из сети
             picture = imageDownloader.downloadPicture(networkAddress, fileName) // качаем фото из сети
-            Log.i("bugfix:imagesDataDirector", "downloading for ${fileName} result not null is = ${picture != null}")
 
             if (picture != null) { // если загрузка успешна,
-                Log.i("bugfix:imagesDataDirector", "for ${fileName} has image is not null = ${picture != null}"
-                )
-
                 // сохраняем фото в память
                 fileName =
                     if (isFull) fileName + "_full" // формируем будущий адрес сохранения
@@ -63,6 +58,7 @@ class ImagesDataDirector(
                 // todo picture saving must be in manager??
                 // сохраняем в памяти
                 val localAddress = imageSager.saveImage(image = picture, fileName = fileName)
+                Log.i ("bugfix: ImagesDataDirector", "image was saved to $localAddress")
                 if (localAddress != NO_LOCAL_IMAGE_PATTERN) // если сохранение успешно
                 // обновляем инстанс модели с учетом файла фото
                     resultRecipe = picture?.let {
@@ -90,7 +86,6 @@ class ImagesDataDirector(
                 }
         }
 
-        Log.i("bugfix:imagesDataDirector", "making callback for $fileName, result not null = ${resultRecipe != null}")
         imageCallback.updateRecipeItem(resultRecipe!!) // пошел коллбек с результатом
     }
 
@@ -104,5 +99,10 @@ class ImagesDataDirector(
         } else {
             recipe.setPreImage(image = picture, localAddress = localAddress)
         }
+    }
+
+    private fun saveImageToStorage(picture: Drawable, pictureName: String): String {
+
+        return NO_LOCAL_IMAGE_PATTERN
     }
 }

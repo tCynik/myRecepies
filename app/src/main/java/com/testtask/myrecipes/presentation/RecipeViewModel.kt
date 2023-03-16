@@ -1,6 +1,5 @@
 package com.testtask.myrecipes.presentation
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,25 +25,6 @@ class RecipeViewModel: ViewModel() {
     val errorProcessor = ErrorsProcessor() // для вывода ошибок на UI
     val constantsURLSet = URLConstantsSet(baseURL = BASE_URL, recipesList = RECIPES_LIST) // данные для формирования запроса из предсхраненных оций
     var repositoryManager: RecipesRepositoryManager? = null // инстанс класса, отвечающий со всеми отношениями с данынми, памятью, сетью, и т.д.
-    var imageLoader: ImageLoader? = null
-
-    init {
-//        val recipesDataCallbackInterface = object: RecipesCallbackInterface{ // реализация интерфейса коллбека результатов
-//            override fun onGotRecipesData(data: List<SingleRecipe>) {
-//                // обновляем UI в главном потоке
-//                recipesDataLive.postValue(data)
-//            }
-//        }
-//        // создаем инстанс менеджера с учетом реализации интерфейса коллбека
-//        repositoryManager = RecipesRepositoryManager(
-//            errorsProcessor = errorProcessor,
-//            constantsURLSet = constantsURLSet,
-//            scope = viewModelScope,
-//            recipesDataCallbackInterface = recipesDataCallbackInterface,
-//            imageDownloader =,
-//            imageLoader = ,
-//            imageSaver =  )
-    }
 
     fun initRepositoryManager( // передача зависимостей. Производится либо после запуска приложения, либо вручную при тестировании
         imageDownloader: ImageDownloader,
@@ -55,9 +35,7 @@ class RecipeViewModel: ViewModel() {
                 // обновляем UI в главном потоке
 
                 val listData: List<SingleRecipe> = data.values.toList()
-                Log.i("bugfix: ViewModel", "!posting the value")
                 recipesDataLive.postValue(listData)
-                Log.i("bugfix: ViewModel", "!after posting the value")
             }
         }
 
@@ -69,11 +47,10 @@ class RecipeViewModel: ViewModel() {
             imageDownloader = imageDownloader,
             imageLoader = imageLoader,
             imageSaver =  imageSaver)
-
     }
 
-    fun updateDataWhenActivityCreated(repositoryStorage: RecipesStorageInterface) {
+    fun updateDataWhenActivityCreated() {
         if (recipesDataLive.value == null)
-            repositoryManager?.updateData(repositoryFromStorage = repositoryStorage)
+            repositoryManager?.updateData()
     }
 }

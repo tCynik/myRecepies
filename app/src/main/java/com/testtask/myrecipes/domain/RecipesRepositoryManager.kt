@@ -1,6 +1,5 @@
 package com.testtask.myrecipes.domain
 
-import android.graphics.drawable.Drawable
 import android.util.Log
 import com.testtask.myrecipes.data.interfaces.RecipesNetRepositoryInterface
 import com.testtask.myrecipes.data.interfaces.RecipesStorageInterface
@@ -58,10 +57,6 @@ class RecipesRepositoryManager(
                     while (iterator.hasNext()) {
                         scope.async (Dispatchers.IO) {imagesDataDirector.getImage(recipe = iterator.next().value, isFull = false)}
                     }
-//                    currentData!!.forEach { id, recipe -> scope.async (Dispatchers.IO) {imagesDataDirector.getImage(recipe = recipe, isFull = false)}}
-//                    for (i in 0 until currentData!!.size) {
-//                        scope.async (Dispatchers.IO) {imagesDataDirector.getImage(recipe = currentData!![i], isFull = false)}
-//                    }
                 }
             }
         }
@@ -70,8 +65,7 @@ class RecipesRepositoryManager(
     }
 
     // по получаемому из активити репозиториям отрабатываем варианты загрузки
-    fun updateData(repositoryFromStorage: RecipesStorageInterface // для работы с контекстом передаем сюда storage для загрузки из памяти
-    ): List<SingleRecipe> {
+    fun updateData(): List<SingleRecipe> {
         // todo: сначала обращаемся к storage и качаем дату из памяти потом обращаемся в интернет.
         //  Когда приходит ответ из сети и если он отличается от информации из памяти, обновляем даныне
 
@@ -93,14 +87,6 @@ class RecipesRepositoryManager(
                 // todo: каждый раз вызывает notifyDataSetChanged() - оптимизировать на notifyItemSetChanged()
                 if (currentData!!.containsKey(recipe.id))
                     currentData!![recipe.id] = recipe
-//                var i = 0
-//                while (i < currentData!!.size) { // перебираем имеющийся массив даты в поисках рецепта с таким же ID
-//                    if (recipe.id == currentData!![i].id) {
-//                        Log.i("bugfix: recipesManager", "setting ${recipe.id} to ${currentData!![i].id} with photo = ${recipe.pre_image.image != null}")
-//                        currentData!![i] = recipe
-//                        i++
-//                    }
-//                }
                 recipesDataCallbackInterface.onGotRecipesData(currentData!!)
             }
         }

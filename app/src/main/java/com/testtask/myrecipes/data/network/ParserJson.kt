@@ -36,20 +36,6 @@ class ParserJson {
                     cookingTime = currentItem.getString("time"),
                     full_image = PictureModel(currentItem.getString("image"), NO_LOCAL_IMAGE_PATTERN, null) ,
                     pre_image = PictureModel(currentItem.getString("thumb"), NO_LOCAL_IMAGE_PATTERN, null))
-//                result.add(SingleRecipe(
-//                    id = id,
-//                    name = currentItem.getString("name"),
-//                    description = currentItem.getString("description"),
-//                    headline = currentItem.getString("headline"),
-//                    difficulty = currentItem.getInt("difficulty"),
-//                    calories = currentItem.getString("calories"),
-//                    fats = currentItem.getString("fats"),
-//                    proteins = currentItem.getString("proteins"),
-//                    carbos = currentItem.getString("carbos"),
-//                    cookingTime = currentItem.getString("time"),
-//                    full_image = PictureModel(currentItem.getString("image"), NO_LOCAL_IMAGE_PATTERN, null) ,
-//                    pre_image = PictureModel(currentItem.getString("thumb"), NO_LOCAL_IMAGE_PATTERN, null))
-//                )
             } catch (e: JSONException) {
                 Log.i("bugfix: parser ", "parsing exception occurred $e")
             }
