@@ -47,11 +47,11 @@ class CursorParser(val context: Context, logger: ToasterAndLogger) {
             full_image = PictureModel(
                 networkAddress = cursor.getString(full_imageLinkIndex),
                 localAddress = fullImageAddress,
-                image = imageLoader.loadImageByRecipeName(fullImageAddress)),
+                image = imageLoader.loadImageByFileName(fullImageAddress)),
             pre_image = PictureModel(
                 networkAddress = cursor.getString(pre_imageLinkIndex),
                 localAddress = preImageAddress,
-                image = imageLoader.loadImageByRecipeName(preImageAddress))
+                image = imageLoader.loadImageByFileName(preImageAddress))
         )
     }
 }

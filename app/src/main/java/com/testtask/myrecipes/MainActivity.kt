@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.testtask.myrecipes.data.network.ImageDownloader
 import com.testtask.myrecipes.data.storage.DataBaseHelper
-import com.testtask.myrecipes.data.storage.Storage
+import com.testtask.myrecipes.data.storage.RecipesStorage
 import com.testtask.myrecipes.data.storage.image_load_save.ImageLoader
 import com.testtask.myrecipes.data.storage.image_load_save.ImageSaver
 import com.testtask.myrecipes.domain.ErrorsProcessor
@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         recipesViewModel = ViewModelProvider(this).get(RecipeViewModel::class.java)
 
         // готовим интерфейсы репозиториев для работы с контекстом при обновлении информации
-        val storageRepository = Storage(this, DataBaseHelper(this), logger = logger)
+        val storageRepository = RecipesStorage(this, DataBaseHelper(this), logger = logger)
         // передаем зависимости во ВМ
         val errorProcessor = ErrorsProcessor()
         val imageDownloader = ImageDownloader(errorProcessor, recipesViewModel!!.viewModelScope)

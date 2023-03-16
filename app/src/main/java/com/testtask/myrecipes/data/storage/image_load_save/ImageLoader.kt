@@ -8,7 +8,7 @@ import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
 import java.io.File
 
 class ImageLoader(val context: Context, val logger: ToasterAndLogger) {
-    fun loadImageByRecipeName(fileName: String): Drawable? { // проверяем наличие файла и зграаем его
+    fun loadImageByFileName(fileName: String): Drawable? { // проверка и загрузка файла по его имени
         val filePath = context.filesDir.absolutePath + File.separator + fileName // формируем путь
         // todo: в процессе разработки модет изменить путь. нужно выносить эту часть наружу сохр-загрузки
         val file = File(filePath) // создаем файл
@@ -21,7 +21,7 @@ class ImageLoader(val context: Context, val logger: ToasterAndLogger) {
         }
     }
 
-    fun loadImageByAddress(fileName: String): Drawable? { // проверяем наличие файла и зграаем его
+    fun loadImageByFileAddress(fileName: String): Drawable? { // проверка и загрузка файла по его адресу
         val file = File(fileName) // создаем файл
         if (file.exists()) { // проверяем, существует ли он
             val bitmap = BitmapFactory.decodeFile(fileName) // декодируем файл в картинку

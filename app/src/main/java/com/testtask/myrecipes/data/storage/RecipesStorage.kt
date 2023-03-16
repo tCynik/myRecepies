@@ -10,9 +10,10 @@ import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
 /**
  * класс для работы с внутренней бД
  * Сохранение-загрузка таблицы рецептов происходит с помощью SQLite
+ * база работает ТОЛЬКО с памятью рецептов, не включая фотки. Фотки подключаются пакетом image_load_save
  */
 
-class Storage(val context: Context, val dataBaseHelper: HelperInterface, val logger: ToasterAndLogger) : RecipesStorageInterface {
+class RecipesStorage(val context: Context, val dataBaseHelper: HelperInterface, val logger: ToasterAndLogger) : RecipesStorageInterface {
     val tableName = TableConstance.TABLE_RECIPES.value()
     var database: SQLiteDatabase? = null
     init {
