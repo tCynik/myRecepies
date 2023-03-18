@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import com.testtask.myrecipes.data.interfaces.RecipesStorageInterface
 import com.testtask.myrecipes.domain.models.SingleRecipe
 import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
+import java.util.*
 
 /**
  * класс для работы с внутренней бД
@@ -20,17 +21,18 @@ class RecipesStorage(val context: Context, val dataBaseHelper: HelperInterface, 
         database = dataBaseHelper.getWritableDatabase()
     }
 
-    override fun loadRecipesData(): List<SingleRecipe> {
+    override fun loadRecipesData(): SortedMap<String, SingleRecipe> {
         // получаем набор строк с данными: Cursor
         val cursor = database!!.query(tableName, null, null, null, null, null, null)
-        val resultData = mutableListOf<SingleRecipe>()
+        val resultData: SortedMap<String, SingleRecipe> = sortedMapOf()
 
         // перебираем курсор построчно
         val parser = CursorParser(context = context, logger = logger)
         if (cursor.moveToFirst()) { // активизируем первую запись курсора, если она вообще есть
             var isHasNext = true
             while (isHasNext) {
-                resultData.add(parser.parse(cursor))
+                val recipe = parser.parse(cursor)
+                resultData[recipe.id] = recipe//.add(parser.parse(cursor))
                 if (cursor.moveToNext()) isHasNext = false
             }
             val index = cursor.getColumnIndex(TableConstance.KEY_ID.value())
@@ -63,20 +65,5 @@ class RecipesStorage(val context: Context, val dataBaseHelper: HelperInterface, 
         contentValues.put(TableConstance.KEY_IMAGE_STORAGE_PRE.value(), recipe.pre_image.networkAddress)
 
         database!!.insert(tableName, null, contentValues)
-    }
-
-    fun saveSingleImage() {
-        /**
-         * сохранение вызывается каждый раз, как загружено из сети новое фото.
-         * - Сначала проверяем, нет ли такого файла? Или тупо перезаписывать поверх?
-         * имя файла = id фото "+ _full" "+ _pre"
-         * каждый раз, как фото сохранено - делаем отметку в модели рецепта, что фото есть в памяти?
-         *
-         * во VM при биндинге айтема проверяем, есть ли фото по полю модели (отдельный класс?)
-         * если фото есть - берем из памяти, если фото нет - тащим из сети, показываем прогрессбар,
-         *
-         * получается, у нас по факту две разных базы - фотографий, и рецептов?.
-         * Нет, т.к. при загрузке из сети адрес всегда налл. Т.е. база фоток все равно перезапишется
-         */
     }
 }

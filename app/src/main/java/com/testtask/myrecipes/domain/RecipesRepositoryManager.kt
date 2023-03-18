@@ -2,10 +2,10 @@ package com.testtask.myrecipes.domain
 
 import android.util.Log
 import com.testtask.myrecipes.data.interfaces.RecipesNetRepositoryInterface
-import com.testtask.myrecipes.data.interfaces.RecipesStorageInterface
 import com.testtask.myrecipes.data.network.*
 import com.testtask.myrecipes.data.network.ImageDownloader
 import com.testtask.myrecipes.data.network.models.ResponseJsonArray
+import com.testtask.myrecipes.data.storage.RecipesStorage
 import com.testtask.myrecipes.data.storage.image_load_save.ImageLoader
 import com.testtask.myrecipes.data.storage.image_load_save.ImageSaver
 import com.testtask.myrecipes.domain.interfaces.ImageDownloadingCallback
@@ -25,6 +25,7 @@ class RecipesRepositoryManager(
     private val constantsURLSet: URLConstantsSet,
     val scope: CoroutineScope,
     private val recipesDataCallbackInterface: RecipesCallbackInterface,
+    val recipesStorage: RecipesStorage,
     val imageLoader: ImageLoader, // todo: reset with interface!
     val imageSaver: ImageSaver, // todo: reset with interface!
     val imageDownloader: ImageDownloader // todo: reset with interface!
@@ -45,7 +46,7 @@ class RecipesRepositoryManager(
             var resultData: SortedMap<String, SingleRecipe>? = null
             override fun onHasResponse(jSonData: JSONArray) { // при получении ответа
                 resultData = parser.parseJson(ResponseJsonArray(jSonData)) // парсим ответ в формат List<SingleRecipe>
-                if (resultData == null) noNetData() // если ответа нет
+                if (resultData == null) currentData = loadRecipesData() // если ответа нет
                 else { // если ответ есть
                     if (currentData == null) {
                         currentData = resultData // сохраняем значения в инстнс сессии
@@ -53,11 +54,10 @@ class RecipesRepositoryManager(
                     }
                     Log.i("bugfix: RepoManager", "got result size: ${currentData!!.size}")
 
-                    val iterator = currentData!!.iterator()
-                    while (iterator.hasNext()) {
-                        scope.async (Dispatchers.IO) {imagesDataDirector.getImage(recipe = iterator.next().value, isFull = false)}
-                    }
                 }
+
+                if (currentData == null) noNetRecipesData()
+                else updatePhotos()
             }
         }
         // инстанс, отвечающий за URL запрос, в конструктор получает реализацию интерфейса для коллбека
@@ -66,9 +66,9 @@ class RecipesRepositoryManager(
 
     // по получаемому из активити репозиториям отрабатываем варианты загрузки
     fun updateData(): List<SingleRecipe> {
-        // todo: сначала обращаемся к storage и качаем дату из памяти потом обращаемся в интернет.
-        //  Когда приходит ответ из сети и если он отличается от информации из памяти, обновляем даныне
-
+        // todo: сначала обращаемся в инет за информацией. Если нет интернета, выводим тост о том, что коннекта нема
+        //  тянемся в репозиторий, достаем оттуда. Если загрузили -тост что инфо из кэша
+        //  если кэша нет - пишем что ошибка загрузки или типтаво.
 
         // создание и обработка запроса данных из сети
         val requestURL = URLMaker(constantsURLSet).makeURLRecipesList() // формируем запрос
@@ -77,8 +77,8 @@ class RecipesRepositoryManager(
         return listOf()//resultData
     }
 
-    private fun updateDataFromStorage(repository: RecipesStorageInterface){
-
+    private fun updateDataFromStorage(): SortedMap<String, SingleRecipe>?{
+        return recipesStorage.loadRecipesData()
     }
 
     private fun getImageCallback(): ImageDownloadingCallback {
@@ -92,8 +92,26 @@ class RecipesRepositoryManager(
         }
     }
 
-    private fun noNetData(){// вызывается для отбаботки ошибок и отправки сообщений
-        Log.i("bugfix: recipesRepoManager", "result data is null")
+    private fun noNetRecipesData(){// действия при невозможности получть дату
+        Log.i("bugfix: recipesRepoManager", "result internet data is null")// make toast
+        val resultData = updateDataFromStorage()
+        if (resultData == null) noLocalRecipesData()
+        else recipesDataCallbackInterface.onGotRecipesData(resultData)
+    }
+
+    private fun noLocalRecipesData(){// действия при невозможности получть дату
+        Log.i("bugfix: recipesRepoManager", "result local data is null") // make toast
+    }
+
+    private fun updatePhotos(){
+        val iterator = currentData!!.iterator()
+        while (iterator.hasNext()) {
+            scope.async (Dispatchers.IO) {imagesDataDirector.getImage(recipe = iterator.next().value, isFull = false)}
+        }
+    }
+
+    private fun loadRecipesData(): SortedMap<String, SingleRecipe>? {
+        return recipesStorage.loadRecipesData()
     }
 
 }

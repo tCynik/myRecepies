@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.testtask.myrecipes.data.interfaces.RecipesStorageInterface
 import com.testtask.myrecipes.data.network.ImageDownloader
 import com.testtask.myrecipes.data.network.URLConstantsSet
+import com.testtask.myrecipes.data.storage.RecipesStorage
 import com.testtask.myrecipes.data.storage.image_load_save.ImageLoader
 import com.testtask.myrecipes.data.storage.image_load_save.ImageSaver
 import com.testtask.myrecipes.domain.ErrorsProcessor
@@ -29,7 +30,8 @@ class RecipeViewModel: ViewModel() {
     fun initRepositoryManager( // передача зависимостей. Производится либо после запуска приложения, либо вручную при тестировании
         imageDownloader: ImageDownloader,
         imageLoader: ImageLoader,
-        imageSaver: ImageSaver) {
+        imageSaver: ImageSaver,
+        recipesStorage: RecipesStorage) {
         val recipesDataCallbackInterface = object: RecipesCallbackInterface{ // реализация интерфейса коллбека результатов
             override fun onGotRecipesData(data: SortedMap<String, SingleRecipe>) {
                 // обновляем UI в главном потоке
@@ -44,6 +46,7 @@ class RecipeViewModel: ViewModel() {
             constantsURLSet = constantsURLSet,
             scope = viewModelScope,
             recipesDataCallbackInterface = recipesDataCallbackInterface,
+            recipesStorage = recipesStorage,
             imageDownloader = imageDownloader,
             imageLoader = imageLoader,
             imageSaver =  imageSaver)

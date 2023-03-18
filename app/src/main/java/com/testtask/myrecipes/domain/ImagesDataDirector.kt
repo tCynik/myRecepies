@@ -51,8 +51,12 @@ class ImagesDataDirector(
          * в девичестве полоили тут.
          * Нужно производить поиск непосредственно на устройстве
          */
+
+        //todo: логика загрузки такая: пытаемся тянуть фото из сети. Стянутые фото пересохраняем на старое место.
+        // Если к сети подрубиться не можем, тянем фото из памяти
         if (localAddress == NO_LOCAL_IMAGE_PATTERN) { // если в рецепте записи о локальной фотке нет, ищем на диске либо качаем ее из сети
             fileName = FileNameGenerator().getName(fileName, isFull)
+            Log.i("bugfix: imagesDataDirector", "first name generation = $fileName")
 
             picture = imageLoader.loadImageByFileName(fileName)
 
@@ -64,6 +68,7 @@ class ImagesDataDirector(
                 if (picture != null) { // если скачали из сети успешно,
                     // сохраняем фото в память
                     fileName = FileNameGenerator().getName(fileName, isFull)
+                    Log.i("bugfix: imagesDataDirector", "second name generation = $fileName")
 
                     // todo picture saving must be in manager??
                     // сохраняем в памяти

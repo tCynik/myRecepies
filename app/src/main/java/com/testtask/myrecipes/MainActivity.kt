@@ -55,7 +55,12 @@ class MainActivity : AppCompatActivity() {
         val imageLoader = ImageLoader(this, logger)
         val imageSaver = ImageSaver(this, logger)
 
-        recipesViewModel!!.initRepositoryManager(imageDownloader = imageDownloader, imageLoader = imageLoader, imageSaver = imageSaver)
+        recipesViewModel!!.initRepositoryManager(
+            imageDownloader = imageDownloader,
+            imageLoader = imageLoader,
+            imageSaver = imageSaver,
+            recipesStorage = storageRepository
+        )
 
         // запуск обновления данных
         recipesViewModel!!.updateDataWhenActivityCreated() // инициируем обновление данных
@@ -71,7 +76,7 @@ class MainActivity : AppCompatActivity() {
     private fun initObservers() {
         recipesViewModel!!.publicDataLive.observe(
             this,
-            Observer{ recipesData -> recipesAdapter.recipesContent = recipesData })
+            Observer { recipesData -> recipesAdapter.recipesContent = recipesData })
     }
 
     private fun makeToast(message: String) {
