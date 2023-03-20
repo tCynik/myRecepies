@@ -47,7 +47,9 @@ class RecipesRepositoryManager(
         val recipesNetCallbackInterface = object : RecipesNetRepositoryInterface { // коллбек для возврата результата при его получении
             var resultData: SortedMap<String, SingleRecipe>? = null
             override fun hasNetRecipesResponse(jSonData: JSONArray?) { // при получении ответа
-                if (resultData == null) currentData = recipesStorage.loadRecipesData() // если ответа нет, грузим из БД
+                if (resultData == null) {
+                    currentData = recipesStorage.loadRecipesData() // если ответа нет, грузим из БД
+                }
                 else { // если ответ есть, грузим из сети
                     resultData = parser.parseJson(ResponseJsonArray(jSonData!!)) // парсим ответ в формат List<SingleRecipe>
                     if (currentData == null) { // если в эту сессию это у нас первый результат
@@ -65,7 +67,7 @@ class RecipesRepositoryManager(
             }
         }
         // инстанс, отвечающий за URL запрос, в конструктор получает реализацию интерфейса для коллбека
-        requestMaker = RecipesRequestMaker(errorsProcessor, scope, recipesNetCallbackInterface)
+        requestMaker = RecipesRequestMaker(logger, scope, recipesNetCallbackInterface)
     }
 
     private fun saveRecipesData(currentData: SortedMap<String, SingleRecipe>) {

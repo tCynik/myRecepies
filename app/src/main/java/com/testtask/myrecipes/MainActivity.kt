@@ -2,6 +2,7 @@ package com.testtask.myrecipes
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -29,7 +30,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun printLog(message: String) {
-            runOnUiThread{println(message)}
+            runOnUiThread{Log.i("bugfix-logger", message)}
         }
     }
 

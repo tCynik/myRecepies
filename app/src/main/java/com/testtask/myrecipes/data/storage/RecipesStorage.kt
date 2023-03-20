@@ -39,10 +39,10 @@ class RecipesStorage(
             while (isHasNext) {
                 val recipe = parser.parse(cursor)
                 resultData[recipe.id] = recipe//.add(parser.parse(cursor))
-                if (cursor.moveToNext()) isHasNext = false
+                isHasNext = cursor.moveToNext()
             }
             val index = cursor.getColumnIndex(TableConstance.KEY_ID.value())
-            Log.i("bugfix: recipesStorage", "loading recipes data. loaded  = ${resultData.size}") // make toast
+            Log.i("bugfix: recipesStorage", "recipes data was loaded. loaded  = ${resultData.size}") // make toast
         } else { // todo: обработка того, что БД пустая
             return null
         }

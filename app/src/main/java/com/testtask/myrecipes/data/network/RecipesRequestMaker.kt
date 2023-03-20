@@ -3,6 +3,7 @@ package com.testtask.myrecipes.data.network
 import android.util.Log
 import com.testtask.myrecipes.data.interfaces.RecipesNetRepositoryInterface
 import com.testtask.myrecipes.domain.ErrorsProcessor
+import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
 import kotlinx.coroutines.*
 import org.json.JSONArray
 import java.io.BufferedReader
@@ -19,9 +20,9 @@ import java.net.URL
  * возвращает jsonArray ответ в формате String (при изменении формата ответа сервера нужно менять код)
  */
 
-const val TIMEOUT = 5000
+const val TIMEOUT = 1000
 class RecipesRequestMaker(
-    val errorsProcessor: ErrorsProcessor,
+    val logger: ToasterAndLogger,
     val scope: CoroutineScope,
     val resultCallback: RecipesNetRepositoryInterface
     ) {
@@ -48,6 +49,7 @@ class RecipesRequestMaker(
         connection.connectTimeout = TIMEOUT // таймаут соединения
 
         try{
+            logger.printLog("running connection into request maker")
             Log.i("bugfix: recipesRequestMaker", "running connection...")
             connection.connect()
             Log.i("bugfix: recipesRequestMaker", "connected code - ${connection.responseCode}")
@@ -58,16 +60,16 @@ class RecipesRequestMaker(
             else return null
 
         } catch (e: MalformedURLException) {
-            errorsProcessor.printError("URL request MalformedURLException: $e")
+            logger.printLog("URL request MalformedURLException: $e")
             e.printStackTrace()
             return null
         } catch (e: IOException) {
-            errorsProcessor.printError("URL request IOException: $e")
-            e.printStackTrace()
+            logger.printLog("URL request IOException: $e")
+            //e.printStackTrace()
             return null
+            e.printStackTrace()
         } catch (e: Exception) {
-            errorsProcessor.printError("Exception: $e")
-            Log.i("bugfix: recipesRequestRepo", "exception $e")
+            logger.printLog("exception $e")
             e.printStackTrace()
             return null
         }
