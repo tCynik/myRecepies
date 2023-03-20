@@ -12,7 +12,6 @@ import java.lang.StringBuilder
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
-import java.sql.Connection
 
 /**
  * Класс, ответственный за направление запроса и асинхронное получение ответа от сервера
@@ -20,26 +19,27 @@ import java.sql.Connection
  * возвращает jsonArray ответ в формате String (при изменении формата ответа сервера нужно менять код)
  */
 
-const val TIMEOUT = 15000
+const val TIMEOUT = 5000
 class RecipesRequestMaker(
     val errorsProcessor: ErrorsProcessor,
     val scope: CoroutineScope,
-    val resultInterface: RecipesNetRepositoryInterface
+    val resultCallback: RecipesNetRepositoryInterface
     ) {
 
-    fun myAsyncRequest(url: String): JSONArray? {
+    fun makeAsyncRequest(url: String): JSONArray? {
         var result: JSONArray? = null
         scope.launch {
             withContext(Dispatchers.Default) {
-                result = asyncUpdating(url)
-                result?.let { resultInterface.onHasResponse(it) }
+                result = updateFromNet(url)
+                result?.let {
+                    Log.i("bugfix: recipesRequestMaker", "making callback with recipes")
+                    resultCallback.onHasResponse(it) }
             }
         }
         return result
     }
 
-
-    private fun asyncUpdating(addressURL: String): JSONArray? { // метод асинхронного обращени к серверу
+    private fun updateFromNet(addressURL: String): JSONArray? { // метод асинхронного обращени к серверу
         val url = URL(addressURL)
         val connection: HttpURLConnection
         connection = url.openConnection() as HttpURLConnection
@@ -47,6 +47,7 @@ class RecipesRequestMaker(
         connection.connectTimeout = TIMEOUT // таймаут соединения
 
         try{
+            Log.i("bugfix: recipesRequestMaker", "running connection...")
             connection.connect()
             Log.i("bugfix: recipesRequestMaker", "connected code - ${connection.responseCode}")
             // todo: switch to logger

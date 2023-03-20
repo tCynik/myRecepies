@@ -3,6 +3,7 @@ package com.testtask.myrecipes.data.storage
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import android.util.Log
 import com.testtask.myrecipes.data.interfaces.RecipesStorageInterface
 import com.testtask.myrecipes.domain.models.SingleRecipe
 import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
@@ -14,14 +15,19 @@ import java.util.*
  * база работает ТОЛЬКО с памятью рецептов, не включая фотки. Фотки подключаются пакетом image_load_save
  */
 
-class RecipesStorage(val context: Context, val dataBaseHelper: HelperInterface, val logger: ToasterAndLogger) : RecipesStorageInterface {
+class RecipesStorage(
+    val context: Context,
+    val dataBaseHelper: HelperInterface,
+    val logger: ToasterAndLogger
+) : RecipesStorageInterface {
     val tableName = TableConstance.TABLE_RECIPES.value()
     var database: SQLiteDatabase? = null
+
     init {
         database = dataBaseHelper.getWritableDatabase()
     }
 
-    override fun loadRecipesData(): SortedMap<String, SingleRecipe> {
+    override fun loadRecipesData(): SortedMap<String, SingleRecipe>? {
         // получаем набор строк с данными: Cursor
         val cursor = database!!.query(tableName, null, null, null, null, null, null)
         val resultData: SortedMap<String, SingleRecipe> = sortedMapOf()
@@ -36,15 +42,24 @@ class RecipesStorage(val context: Context, val dataBaseHelper: HelperInterface, 
                 if (cursor.moveToNext()) isHasNext = false
             }
             val index = cursor.getColumnIndex(TableConstance.KEY_ID.value())
-
-        } else {} // todo: обработка того, что БД пустая
+            Log.i("bugfix: recipesStorage", "loadinr recipes data. loaded  = ${resultData.size}") // make toast
+        } else { // todo: обработка того, что БД пустая
+            return null
+        }
 
         val db = dataBaseHelper.getReadableDatabase()
         return resultData
     }
 
-    override fun saveRecipesData(recipes: List<SingleRecipe>) {
-        recipes.forEach{recipe -> saveSingleRecipe(recipe)}
+    override fun saveRecipesData(recipes: SortedMap<String, SingleRecipe>) {
+        val iterator = recipes.iterator()
+        while (iterator.hasNext()) {
+            val recipe: SingleRecipe = iterator.next().value
+            Log.i("bugfix: recipesStorage", "saving recipe with ID = ${recipe.id}") // make toast
+
+            saveSingleRecipe(recipe)
+        }
+        //recipes.forEach{recipe -> saveSingleRecipe(recipe)}
     }
 
     private fun saveSingleRecipe(recipe: SingleRecipe) {
@@ -59,10 +74,22 @@ class RecipesStorage(val context: Context, val dataBaseHelper: HelperInterface, 
         contentValues.put(TableConstance.KEY_PROTEINS.value(), recipe.proteins)
         contentValues.put(TableConstance.KEY_CARBOS.value(), recipe.carbos)
         contentValues.put(TableConstance.KEY_TIME.value(), recipe.cookingTime)
-        contentValues.put(TableConstance.KEY_IMAGE_LINK_FULL.value(), recipe.full_image.networkAddress)
-        contentValues.put(TableConstance.KEY_IMAGE_STORAGE_FULL.value(), recipe.full_image.localAddress)
-        contentValues.put(TableConstance.KEY_IMAGE_LINK_PRE.value(), recipe.pre_image.networkAddress)
-        contentValues.put(TableConstance.KEY_IMAGE_STORAGE_PRE.value(), recipe.pre_image.networkAddress)
+        contentValues.put(
+            TableConstance.KEY_IMAGE_LINK_FULL.value(),
+            recipe.full_image.networkAddress
+        )
+        contentValues.put(
+            TableConstance.KEY_IMAGE_STORAGE_FULL.value(),
+            recipe.full_image.localAddress
+        )
+        contentValues.put(
+            TableConstance.KEY_IMAGE_LINK_PRE.value(),
+            recipe.pre_image.networkAddress
+        )
+        contentValues.put(
+            TableConstance.KEY_IMAGE_STORAGE_PRE.value(),
+            recipe.pre_image.networkAddress
+        )
 
         database!!.insert(tableName, null, contentValues)
     }

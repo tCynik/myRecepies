@@ -56,12 +56,11 @@ class ImagesDataDirector(
         // Если к сети подрубиться не можем, тянем фото из памяти
         if (localAddress == NO_LOCAL_IMAGE_PATTERN) { // если в рецепте записи о локальной фотке нет, ищем на диске либо качаем ее из сети
             fileName = FileNameGenerator().getName(fileName, isFull)
-            Log.i("bugfix: imagesDataDirector", "first name generation = $fileName")
 
             picture = imageLoader.loadImageByFileName(fileName)
 
             if (picture == null) { // на диске тоже нет - значит, качаем из сети
-                Log.i("bugfix: imagesDataDirector", "no has saved picture, downloading from net")
+                Log.i("bugfix: imagesDataDirector", "no saved picture, downloading from net")
 
                 picture = imageDownloader.downloadPicture(networkAddress, fileName) // качаем фото из сети
 
