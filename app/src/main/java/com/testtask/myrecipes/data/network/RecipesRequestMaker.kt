@@ -31,9 +31,10 @@ class RecipesRequestMaker(
         scope.launch {
             withContext(Dispatchers.Default) {
                 result = updateFromNet(url)
-                result?.let {
-                    Log.i("bugfix: recipesRequestMaker", "making callback with recipes")
-                    resultCallback.onHasResponse(it) }
+                resultCallback.hasNetRecipesResponse(result)
+//                result?.let {
+//                    Log.i("bugfix: recipesRequestMaker", "making callback with recipes")
+//                    resultCallback.hasNetRecipesResponse(it) }
             }
         }
         return result

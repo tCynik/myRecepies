@@ -25,11 +25,11 @@ class MainActivity : AppCompatActivity() {
 
     val logger = object : ToasterAndLogger {
         override fun printToast(message: String) {
-            makeToast(message)
+            runOnUiThread{ makeToast(message) }
         }
 
-        override fun printLog(messge: String) {
-            println(messge)
+        override fun printLog(message: String) {
+            runOnUiThread{println(message)}
         }
     }
 
@@ -59,7 +59,8 @@ class MainActivity : AppCompatActivity() {
             imageDownloader = imageDownloader,
             imageLoader = imageLoader,
             imageSaver = imageSaver,
-            recipesStorage = storageRepository
+            recipesStorage = storageRepository,
+            logger = logger
         )
 
         // запуск обновления данных

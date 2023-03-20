@@ -14,6 +14,7 @@ import com.testtask.myrecipes.domain.ErrorsProcessor
 import com.testtask.myrecipes.domain.RecipesRepositoryManager
 import com.testtask.myrecipes.domain.models.SingleRecipe
 import com.testtask.myrecipes.presentation.interfaces.RecipesCallbackInterface
+import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
 import java.util.*
 
 const val BASE_URL = "https://hf-android-app.s3-eu-west-1.amazonaws.com/android-test/"
@@ -31,7 +32,8 @@ class RecipeViewModel: ViewModel() {
         imageDownloader: ImageDownloader,
         imageLoader: ImageLoader,
         imageSaver: ImageSaver,
-        recipesStorage: RecipesStorage) {
+        recipesStorage: RecipesStorage,
+        logger: ToasterAndLogger) {
         val recipesDataCallbackInterface = object: RecipesCallbackInterface{ // реализация интерфейса коллбека результатов
             override fun onGotRecipesData(data: SortedMap<String, SingleRecipe>) {
                 // обновляем UI в главном потоке
@@ -49,7 +51,8 @@ class RecipeViewModel: ViewModel() {
             recipesStorage = recipesStorage,
             imageDownloader = imageDownloader,
             imageLoader = imageLoader,
-            imageSaver =  imageSaver)
+            imageSaver =  imageSaver,
+            logger = logger)
     }
 
     fun updateDataWhenActivityCreated() {

@@ -42,7 +42,7 @@ class RecipesStorage(
                 if (cursor.moveToNext()) isHasNext = false
             }
             val index = cursor.getColumnIndex(TableConstance.KEY_ID.value())
-            Log.i("bugfix: recipesStorage", "loadinr recipes data. loaded  = ${resultData.size}") // make toast
+            Log.i("bugfix: recipesStorage", "loading recipes data. loaded  = ${resultData.size}") // make toast
         } else { // todo: обработка того, что БД пустая
             return null
         }
