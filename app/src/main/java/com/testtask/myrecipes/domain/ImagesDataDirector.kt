@@ -56,7 +56,7 @@ class ImagesDataDirector(
         // Если к сети подрубиться не можем, тянем фото из памяти
         if (localAddress == NO_LOCAL_IMAGE_PATTERN) { // если в рецепте записи о локальной фотке нет, ищем на диске либо качаем ее из сети
             fileName = FileNameGenerator().getName(fileName, isFull)
-
+            Log.i("bugfix: ImagesDirector", "loading file name = $fileName")
             picture = imageLoader.loadImageByFileName(fileName)
 
             if (picture == null) { // на диске тоже нет - значит, качаем из сети
@@ -96,7 +96,7 @@ class ImagesDataDirector(
             }
 
         } else { // если запись о файле есть, берем из памяти по адресу файла
-            Log.i("bugfix:imagesDataDirector", "got local image for $fileName")
+            Log.i("bugfix:imagesDataDirector", "getting local image for $fileName")
             picture = imageLoader.loadImageByFileAddress(localAddress)
             val localAddress = if (isFull) recipe.full_image.localAddress
             else recipe.pre_image.localAddress

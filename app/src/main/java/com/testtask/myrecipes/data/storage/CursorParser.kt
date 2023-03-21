@@ -12,8 +12,7 @@ import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
  */
 // todo: сейчас сразу же происходит загрузка фото из сторейджа. Рекомендуется оставить без фотки и организовать загрузку отдельно.
 
-class CursorParser(val context: Context, logger: ToasterAndLogger) {
-    val imageLoader = ImageLoader(context, logger)
+class CursorParser(logger: ToasterAndLogger) {
     fun parse(cursor: Cursor): SingleRecipe {
         val idIndex = cursor.getColumnIndex(TableConstance.KEY_ITEM.value())
         val nameIndex = cursor.getColumnIndex(TableConstance.KEY_NAME.value())
@@ -47,11 +46,11 @@ class CursorParser(val context: Context, logger: ToasterAndLogger) {
             full_image = PictureModel(
                 networkAddress = cursor.getString(full_imageLinkIndex),
                 localAddress = fullImageAddress,
-                image = imageLoader.loadImageByFileName(fullImageAddress)),
+                image = null),//imageLoader.loadImageByFileName(fullImageAddress)),
             pre_image = PictureModel(
                 networkAddress = cursor.getString(pre_imageLinkIndex),
                 localAddress = preImageAddress,
-                image = imageLoader.loadImageByFileName(preImageAddress))
+                image = null)//imageLoader.loadImageByFileName(preImageAddress))
         )
     }
 }

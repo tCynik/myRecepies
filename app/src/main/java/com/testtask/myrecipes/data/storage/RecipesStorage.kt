@@ -28,17 +28,19 @@ class RecipesStorage(
     }
 
     override fun loadRecipesData(): SortedMap<String, SingleRecipe>? {
+        Log.i ("bugfix: recipesStorage", "loading recipes data")
         // получаем набор строк с данными: Cursor
         val cursor = database!!.query(tableName, null, null, null, null, null, null)
         val resultData: SortedMap<String, SingleRecipe> = sortedMapOf()
 
         // перебираем курсор построчно
-        val parser = CursorParser(context = context, logger = logger)
+        val parser = CursorParser(logger = logger)
         if (cursor.moveToFirst()) { // активизируем первую запись курсора, если она вообще есть
             var isHasNext = true
             while (isHasNext) {
                 val recipe = parser.parse(cursor)
                 resultData[recipe.id] = recipe//.add(parser.parse(cursor))
+                Log.i("bugfix: recipesStorage", "loaded recipe with pre_image local address ${recipe.pre_image.localAddress}")
                 isHasNext = cursor.moveToNext()
             }
             val index = cursor.getColumnIndex(TableConstance.KEY_ID.value())

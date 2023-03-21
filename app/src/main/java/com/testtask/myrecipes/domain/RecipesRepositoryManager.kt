@@ -47,8 +47,8 @@ class RecipesRepositoryManager(
         val recipesNetCallbackInterface = object : RecipesNetRepositoryInterface { // коллбек для возврата результата при его получении
             var resultData: SortedMap<String, SingleRecipe>? = null
             override fun hasNetRecipesResponse(jSonData: JSONArray?) { // при получении ответа
-                if (resultData == null) {
-                    currentData = recipesStorage.loadRecipesData() // если ответа нет, грузим из БД
+                if (jSonData == null) {
+                    currentData = recipesStorage.loadRecipesData() // если в коллбеке ответа нет, грузим из БД
                 }
                 else { // если ответ есть, грузим из сети
                     resultData = parser.parseJson(ResponseJsonArray(jSonData!!)) // парсим ответ в формат List<SingleRecipe>
@@ -71,7 +71,8 @@ class RecipesRepositoryManager(
     }
 
     private fun saveRecipesData(currentData: SortedMap<String, SingleRecipe>) {
-        Log.i("bugfix: RepoManager", "updating the data..")
+        Log.i("bugfix: RepoManager", "saving downloaded recipes data.")
+        Log.i("bugfix: RepoManager", "local image address = ${currentData[currentData.firstKey()]!!.pre_image.localAddress}")
         recipesStorage.saveRecipesData(currentData)
     }
 
@@ -89,9 +90,9 @@ class RecipesRepositoryManager(
         return listOf()//resultData
     }
 
-    private fun updateDataFromStorage(): SortedMap<String, SingleRecipe>?{
-        return recipesStorage.loadRecipesData()
-    }
+//    private fun updateDataFromStorage(): SortedMap<String, SingleRecipe>?{
+//        return recipesStorage.loadRecipesData()
+//    }
 
     private fun updateViewWithImageCallback(): ImageDownloadingCallback {
         return object: ImageDownloadingCallback { // коллбек для обновления даты при получении изображения.
@@ -104,9 +105,9 @@ class RecipesRepositoryManager(
         }
     }
 
-    private fun noNetRecipesData(){// действия при невозможности получть дату
+    private fun noNetRecipesData(){// действия при невозможности получть дату с сервера
         Log.i("bugfix: recipesRepoManager", "result internet data is empty. Trying to update from storage")// make toast
-        val resultData = recipesStorage.loadRecipesData()
+        val resultData = recipesStorage.loadRecipesData() // если нет ответа из удаленной базы
         if (resultData == null) noLocalRecipesData()
         else {
             logger.printToast("Data was loaded from cash")
