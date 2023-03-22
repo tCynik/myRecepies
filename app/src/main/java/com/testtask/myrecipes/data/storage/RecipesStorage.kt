@@ -40,7 +40,6 @@ class RecipesStorage(
             while (isHasNext) {
                 val recipe = parser.parse(cursor)
                 resultData[recipe.id] = recipe//.add(parser.parse(cursor))
-                Log.i("bugfix: recipesStorage", "loaded recipe with pre_image local address ${recipe.pre_image.localAddress}")
                 isHasNext = cursor.moveToNext()
             }
             val index = cursor.getColumnIndex(TableConstance.KEY_ID.value())
@@ -90,7 +89,7 @@ class RecipesStorage(
         )
         contentValues.put(
             TableConstance.KEY_IMAGE_STORAGE_PRE.value(),
-            recipe.pre_image.networkAddress
+            recipe.pre_image.localAddress
         )
 
         database!!.insert(tableName, null, contentValues)
