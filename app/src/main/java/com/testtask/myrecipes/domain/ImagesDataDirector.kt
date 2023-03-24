@@ -8,6 +8,7 @@ import com.testtask.myrecipes.data.storage.image_load_save.ImageLoader
 import com.testtask.myrecipes.data.storage.image_load_save.ImageSaver
 import com.testtask.myrecipes.domain.interfaces.ImageDownloadingCallback
 import com.testtask.myrecipes.domain.models.SingleRecipe
+import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
 
 
 /**
@@ -27,9 +28,10 @@ private const val NO_LOCAL_IMAGE_PATTERN = "EMPTY"
 class ImagesDataDirector(
     val imageCallback: ImageDownloadingCallback,
     val imageLoader: ImageLoader,
-    val imageSager: ImageSaver,
-    val imageDownloader: ImageDownloader
-) { // todo: Injection: interface with callback of recipe with photos; storages
+    val imageSager: ImageSaver,//todo: Injection: interface with callback of recipe with photos; storages
+    val imageDownloader: ImageDownloader,
+    val logger: ToasterAndLogger
+) { //
 
     fun getImage(recipe: SingleRecipe, isFull: Boolean) {
         var localAddress = ""
@@ -47,89 +49,47 @@ class ImagesDataDirector(
         var resultRecipe: SingleRecipe? = null
 
         /**
-         * ну конечно же не будет адреса сохранения, т.к. мы список только что скачали из сети, и
-         * в девичестве полоили тут.
-         * Нужно производить поиск непосредственно на устройстве
+         * логика загрузки такая: пытаемся тянуть фото из сети. (это новое фото)
+         * Стянутые из сети фото пересохраняем на старое место. (обновляем фото)
+         * Если к сети подрубиться не можем, тянем фото из памяти (это старое фото)
          */
 
-        //todo: 1. логика загрузки такая: пытаемся тянуть фото из сети. Стянутые фото пересохраняем на старое место.
-        // Если к сети подрубиться не можем, тянем фото из памяти
+        fileName = FileNameGenerator().getName(fileName, isFull)
 
-        if (localAddress == NO_LOCAL_IMAGE_PATTERN) { // если в рецепте записи о локальной фотке нет, ищем на диске либо качаем ее из сети
-            fileName = FileNameGenerator().getName(fileName, isFull)
-            Log.i("bugfix: ImagesDirector", "loading file name = $fileName")
-            picture = imageLoader.loadImageByFileName(fileName)
-
-            if (picture == null) { // на диске тоже нет - значит, качаем из сети
-                Log.i("bugfix: imagesDataDirector", "no saved picture, downloading from net")
-
-                picture = imageDownloader.downloadPicture(networkAddress, fileName) // качаем фото из сети
-
-                if (picture != null) { // если скачали из сети успешно,
-                    // сохраняем фото в память
-                    fileName = FileNameGenerator().getName(fileName, isFull)
-                    Log.i("bugfix: imagesDataDirector", "second name generation = $fileName")
-
-                    // todo picture saving must be in manager??
-                    // сохраняем в памяти
-                    val localAddress = imageSager.saveImage(image = picture, fileName = fileName)
-                    Log.i("bugfix: ImagesDataDirector", "image was saved to $localAddress")
-                    if (localAddress != NO_LOCAL_IMAGE_PATTERN) // если сохранение успешно
-                    // обновляем инстанс модели с учетом файла фото
-                        resultRecipe = picture?.let {
-                            updateRecipe(
-                                recipe = recipe,
-                                picture = it,
-                                localAddress = localAddress,
-                                isFull = isFull
-                            )
-                        }
-                }
-
-            } else { // на диске нашлась, загружаем
-                Log.i("bugfix: imagesDataDirector", "has saved picture, updating")
-                resultRecipe = updateRecipe(
-                    recipe = recipe,
-                    picture = picture,
-                    localAddress = localAddress,
-                    isFull = isFull
-                )
-            }
-
-        } else { // если запись о файле есть, берем из памяти по адресу файла
-            Log.i("bugfix:imagesDataDirector", "getting local image for $fileName")
-            picture = imageLoader.loadImageByFileAddress(localAddress)
-            val localAddress = if (isFull) recipe.full_image.localAddress
-            else recipe.pre_image.localAddress
-            if (isFull)
+        picture = imageDownloader.downloadPicture(networkAddress, fileName) // качаем фото из сети
+        if (picture != null) { // если скачали из сети успешно, сохраняем фото
+            val localAddress = imageSager.saveImage(image = picture, fileName = fileName)
+            Log.i("bugfix: ImagesDataDirector", "image ${recipe.id} was downloaded, saved to $localAddress")
+            if (localAddress != NO_LOCAL_IMAGE_PATTERN) // если сохранение успешно, то с учетом записи адреса файла
                 resultRecipe = picture?.let {
-                    updateRecipe(
+                    updateRecipe( // обновляем рецепт
                         recipe = recipe,
                         picture = it,
                         localAddress = localAddress,
                         isFull = isFull
                     )
                 }
+
+        } else { // если неуспешно, идем в память
+            picture = imageLoader.loadImageByFileAddress(localAddress)
+            if (picture != null) {
+                Log.i("bugfix: ImagesDataDirector", "image ${recipe.id} was not downloaded, loading one from local")
+                resultRecipe = updateRecipe(
+                    recipe = recipe,
+                    picture = picture,
+                    localAddress = localAddress,
+                    isFull = isFull)
+            }
+            else {
+                logger.printToast("image cannot be loaded")
+                logger.printLog("image ${recipe.id} was not loaded from local and remote recourse both")
+            }
         }
 
-        imageCallback.updateRecipeItem(resultRecipe!!) // пошел коллбек с результатом
-    }
+        if (picture != null) // если картинка всё же есть, обновляем рецепт
+            imageCallback.updateRecipeItem(resultRecipe!!) // пошел коллбек с результатом
 
-//    fun saveImage(recipe: SingleRecipe, picture: Drawable): SingleRecipe {
-//        val fileName = recipe.id
-//        val localAddress = imageSager.saveImage(image = picture, fileName = fileName)
-//        Log.i ("bugfix: ImagesDataDirector", "image was saved to $localAddress")
-//        if (localAddress != NO_LOCAL_IMAGE_PATTERN) // если сохранение успешно
-//        // обновляем инстанс модели с учетом файла фото
-//            resultRecipe = picture?.let {
-//                updateRecipe(
-//                    recipe = recipe,
-//                    picture = it,
-//                    localAddress = localAddress,
-//                    isFull = isFull
-//                )
-//            }
-//    }
+    }
 
     private fun updateRecipe(
         recipe: SingleRecipe,
@@ -144,8 +104,4 @@ class ImagesDataDirector(
         }
     }
 
-    private fun saveImageToStorage(picture: Drawable, pictureName: String): String {
-
-        return NO_LOCAL_IMAGE_PATTERN
-    }
 }

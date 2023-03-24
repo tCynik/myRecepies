@@ -41,7 +41,8 @@ class RecipesRepositoryManager(
         imageCallback = updateViewWithImageCallback(),
         imageLoader = imageLoader,
         imageSager = imageSaver,
-        imageDownloader = imageDownloader)
+        imageDownloader = imageDownloader,
+        logger = logger)
 
     init {
         val recipesNetCallbackInterface = object : RecipesNetRepositoryInterface { // коллбек для возврата результата при его получении
@@ -100,6 +101,7 @@ class RecipesRepositoryManager(
                 // todo: каждый раз вызывает notifyDataSetChanged() - оптимизировать на notifyItemSetChanged()
                 if (currentData!!.containsKey(recipe.id))
                     currentData!![recipe.id] = recipe
+                saveRecipesData(currentData!!)
                 recipesDataCallbackInterface.onGotRecipesData(currentData!!)
             }
         }
