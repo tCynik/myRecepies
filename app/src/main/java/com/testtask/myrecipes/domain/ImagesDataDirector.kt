@@ -60,7 +60,7 @@ class ImagesDataDirector(
         if (picture != null) { // если скачали из сети успешно, сохраняем фото
             val localAddress = imageSager.saveImage(image = picture, fileName = fileName)
             Log.i("bugfix: ImagesDataDirector", "image ${recipe.id} was downloaded, saved to $localAddress")
-            if (localAddress != NO_LOCAL_IMAGE_PATTERN) // если сохранение успешно, то с учетом записи адреса файла
+            if (localAddress != NO_LOCAL_IMAGE_PATTERN) {// если сохранение успешно, то с учетом записи адреса файла
                 resultRecipe = picture?.let {
                     updateRecipe( // обновляем рецепт
                         recipe = recipe,
@@ -70,7 +70,10 @@ class ImagesDataDirector(
                     )
                 }
 
-        } else { // если неуспешно, идем в память
+                imageCallback.updateRecipeItemAndSave(recipe)
+            }
+
+        } else { // если скачивание из сети неуспешно, идем в память
             picture = imageLoader.loadImageByFileAddress(localAddress)
             if (picture != null) {
                 Log.i("bugfix: ImagesDataDirector", "image ${recipe.id} was not downloaded, loading one from local")
@@ -87,7 +90,7 @@ class ImagesDataDirector(
         }
 
         if (picture != null) // если картинка всё же есть, обновляем рецепт
-            imageCallback.updateRecipeItem(resultRecipe!!) // пошел коллбек с результатом
+            imageCallback.updateRecipeItemNoSave(resultRecipe!!) // пошел коллбек с результатом
 
     }
 

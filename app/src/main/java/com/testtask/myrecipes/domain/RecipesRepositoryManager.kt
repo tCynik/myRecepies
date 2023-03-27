@@ -55,7 +55,8 @@ class RecipesRepositoryManager(
                     resultData = parser.parseJson(ResponseJsonArray(jSonData!!)) // парсим ответ в формат List<SingleRecipe>
                     if (currentData == null) { // если в эту сессию это у нас первый результат
                         currentData = resultData // сохраняем значения в инстанс сессии
-                        saveRecipesData(resultData!!)
+                        Log.i("bugfix: RepoManager", "saving downloaded recipes data.")
+                        saveRecipesData(resultData!!) // сохраняем новую БД рецептов
                         recipesDataCallbackInterface.onGotRecipesData(resultData!!) // отправляем во ВМ коллбек с результатом
                     }
                     logger.printToast("Data downloaded from server")
@@ -72,7 +73,6 @@ class RecipesRepositoryManager(
     }
 
     private fun saveRecipesData(currentData: SortedMap<String, SingleRecipe>) {
-        Log.i("bugfix: RepoManager", "saving downloaded recipes data.")
         Log.i("bugfix: RepoManager", "local image address = ${currentData[currentData.firstKey()]!!.pre_image.localAddress}")
         recipesStorage.saveRecipesData(currentData)
     }
@@ -97,11 +97,17 @@ class RecipesRepositoryManager(
 
     private fun updateViewWithImageCallback(): ImageDownloadingCallback {
         return object: ImageDownloadingCallback { // коллбек для обновления даты при получении изображения.
-            override fun updateRecipeItem(recipe: SingleRecipe) {
+            override fun updateRecipeItemAndSave(recipe: SingleRecipe) {
                 // todo: каждый раз вызывает notifyDataSetChanged() - оптимизировать на notifyItemSetChanged()
                 if (currentData!!.containsKey(recipe.id))
                     currentData!![recipe.id] = recipe
                 saveRecipesData(currentData!!)
+                recipesDataCallbackInterface.onGotRecipesData(currentData!!)
+            }
+
+            override fun updateRecipeItemNoSave(recipe: SingleRecipe) {
+                if (currentData!!.containsKey(recipe.id))
+                    currentData!![recipe.id] = recipe
                 recipesDataCallbackInterface.onGotRecipesData(currentData!!)
             }
         }
