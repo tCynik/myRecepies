@@ -50,6 +50,7 @@ class RecipesRepositoryManager(
             override fun hasNetRecipesResponse(jSonData: JSONArray?) { // при получении ответа
                 if (jSonData == null) {
                     currentData = recipesStorage.loadRecipesData() // если в коллбеке ответа нет, грузим из БД
+                    recipesDataCallbackInterface.onGotRecipesData(currentData!!) // отправляем во ВМ коллбек с результатом
                 }
                 else { // если ответ есть, грузим из сети
                     resultData = parser.parseJson(ResponseJsonArray(jSonData!!)) // парсим ответ в формат List<SingleRecipe>
