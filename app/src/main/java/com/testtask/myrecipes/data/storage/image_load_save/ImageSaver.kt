@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
+import com.testtask.myrecipes.data.interfaces.ImageSaverInterface
 import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
 import java.io.File
 import java.io.FileOutputStream
@@ -19,8 +20,8 @@ import java.io.OutputStream
 
 private const val NO_LOCAL_IMAGE_PATTERN = "EMPTY"
 
-class ImageSaver(val contextActivity: Context, val logger: ToasterAndLogger) {
-    fun saveImage(image: Drawable, fileName: String): String {
+class ImageSaver(val contextActivity: Context, val logger: ToasterAndLogger): ImageSaverInterface {
+    override fun saveImage(image: Drawable, fileName: String): String {
 
         val bitmap = (image as? BitmapDrawable)?.bitmap ?: return NO_LOCAL_IMAGE_PATTERN // преобразование Drawable в Bitmap
 

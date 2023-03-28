@@ -1,7 +1,7 @@
 package com.testtask.myrecipes.domain
 
 import android.util.Log
-import com.testtask.myrecipes.data.interfaces.RecipesNetRepositoryInterface
+import com.testtask.myrecipes.data.interfaces.*
 import com.testtask.myrecipes.data.network.*
 import com.testtask.myrecipes.data.network.ImageDownloader
 import com.testtask.myrecipes.data.network.models.ResponseJsonArray
@@ -26,10 +26,10 @@ class RecipesRepositoryManager(
     private val constantsURLSet: URLConstantsSet,
     val scope: CoroutineScope,
     private val recipesDataCallbackInterface: RecipesCallbackInterface,
-    val recipesStorage: RecipesStorage,
-    val imageLoader: ImageLoader, // todo: reset with interface!
-    val imageSaver: ImageSaver, // todo: reset with interface!
-    val imageDownloader: ImageDownloader, // todo: reset with interface!
+    val recipesStorage: RecipesStorageInterface,
+    val imageLoader: ImageLoaderInterface,
+    val imageSaver: ImageSaverInterface,
+    val imageDownloader: ImageDownloaderInterface,
     val logger: ToasterAndLogger
                         ) {
     private var currentData: SortedMap<String, SingleRecipe>? = null // текущие данные, согласно последнему обновлению
@@ -92,17 +92,14 @@ class RecipesRepositoryManager(
         return listOf()//resultData
     }
 
-//    private fun updateDataFromStorage(): SortedMap<String, SingleRecipe>?{
-//        return recipesStorage.loadRecipesData()
-//    }
-
     private fun updateViewWithImageCallback(): ImageDownloadingCallback {
         return object: ImageDownloadingCallback { // коллбек для обновления даты при получении изображения.
             override fun updateRecipeItemAndSave(recipe: SingleRecipe) {
                 // todo: каждый раз вызывает notifyDataSetChanged() - оптимизировать на notifyItemSetChanged()
                 if (currentData!!.containsKey(recipe.id))
                     currentData!![recipe.id] = recipe
-                saveRecipesData(currentData!!)
+                recipesStorage.saveSingleRecipe(recipe)
+                //saveRecipesData(currentData!!)
                 recipesDataCallbackInterface.onGotRecipesData(currentData!!)
             }
 

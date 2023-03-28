@@ -6,5 +6,7 @@ import java.util.*
 interface RecipesStorageInterface {
     fun loadRecipesData(): SortedMap<String, SingleRecipe>?
 
-    fun saveRecipesData(recipe: SortedMap<String, SingleRecipe>)
+    fun saveRecipesData(recipes: SortedMap<String, SingleRecipe>)
+
+    fun saveSingleRecipe(recipe: SingleRecipe)
 }

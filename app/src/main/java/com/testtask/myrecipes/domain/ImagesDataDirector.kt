@@ -2,10 +2,10 @@ package com.testtask.myrecipes.domain
 
 import android.graphics.drawable.Drawable
 import android.util.Log
-import com.testtask.myrecipes.data.network.ImageDownloader
+import com.testtask.myrecipes.data.interfaces.ImageDownloaderInterface
+import com.testtask.myrecipes.data.interfaces.ImageLoaderInterface
+import com.testtask.myrecipes.data.interfaces.ImageSaverInterface
 import com.testtask.myrecipes.data.storage.image_load_save.FileNameGenerator
-import com.testtask.myrecipes.data.storage.image_load_save.ImageLoader
-import com.testtask.myrecipes.data.storage.image_load_save.ImageSaver
 import com.testtask.myrecipes.domain.interfaces.ImageDownloadingCallback
 import com.testtask.myrecipes.domain.models.SingleRecipe
 import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
@@ -27,9 +27,9 @@ private const val NO_LOCAL_IMAGE_PATTERN = "EMPTY"
 
 class ImagesDataDirector(
     val imageCallback: ImageDownloadingCallback,
-    val imageLoader: ImageLoader,
-    val imageSager: ImageSaver,//todo: Injection: interface with callback of recipe with photos; storages
-    val imageDownloader: ImageDownloader,
+    val imageLoader: ImageLoaderInterface,
+    val imageSager: ImageSaverInterface,//todo: Injection: interface with callback of recipe with photos; storages
+    val imageDownloader: ImageDownloaderInterface,
     val logger: ToasterAndLogger
 ) { //
 
@@ -57,6 +57,7 @@ class ImagesDataDirector(
         fileName = FileNameGenerator().getName(fileName, isFull)
 
         picture = imageDownloader.downloadPicture(networkAddress, fileName) // качаем фото из сети
+
         if (picture != null) { // если скачали из сети успешно, сохраняем фото
             val localAddress = imageSager.saveImage(image = picture, fileName = fileName)
             Log.i("bugfix: ImagesDataDirector", "image ${recipe.id} was downloaded, saved to $localAddress")
@@ -70,7 +71,7 @@ class ImagesDataDirector(
                     )
                 }
 
-                imageCallback.updateRecipeItemAndSave(recipe)
+                imageCallback.updateRecipeItemAndSave(resultRecipe!!)
             }
 
         } else { // если скачивание из сети неуспешно, идем в память
@@ -83,6 +84,7 @@ class ImagesDataDirector(
                     localAddress = localAddress,
                     isFull = isFull)
             }
+
             else {
                 logger.printToast("image cannot be loaded")
                 logger.printLog("image ${recipe.id} was not loaded from local and remote recourse both")

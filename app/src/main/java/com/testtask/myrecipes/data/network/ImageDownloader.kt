@@ -2,6 +2,8 @@ package com.testtask.myrecipes.data.network
 
 import android.graphics.drawable.Drawable
 import android.util.Log
+import com.testtask.myrecipes.data.interfaces.ImageDownloaderInterface
+import com.testtask.myrecipes.data.interfaces.ImageLoaderInterface
 import com.testtask.myrecipes.domain.ErrorsProcessor
 import kotlinx.coroutines.*
 import java.io.IOException
@@ -9,9 +11,9 @@ import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
 
-class ImageDownloader(val errorsProcessor: ErrorsProcessor, val scope: CoroutineScope) {
+class ImageDownloader(val errorsProcessor: ErrorsProcessor, val scope: CoroutineScope): ImageDownloaderInterface {
 
-    fun downloadPicture (addressURL: String, fileName: String): Drawable? {
+    override fun downloadPicture (addressURL: String, fileName: String): Drawable? {
         try {
             // создаем соединение
             val url = URL(addressURL)

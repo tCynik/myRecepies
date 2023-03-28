@@ -4,6 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.testtask.myrecipes.data.interfaces.ImageDownloaderInterface
+import com.testtask.myrecipes.data.interfaces.ImageLoaderInterface
+import com.testtask.myrecipes.data.interfaces.ImageSaverInterface
 import com.testtask.myrecipes.data.interfaces.RecipesStorageInterface
 import com.testtask.myrecipes.data.network.ImageDownloader
 import com.testtask.myrecipes.data.network.URLConstantsSet
@@ -29,10 +32,10 @@ class RecipeViewModel: ViewModel() {
     var repositoryManager: RecipesRepositoryManager? = null // инстанс класса, отвечающий со всеми отношениями с данынми, памятью, сетью, и т.д.
 
     fun initRepositoryManager( // передача зависимостей. Производится либо после запуска приложения, либо вручную при тестировании
-        imageDownloader: ImageDownloader,
-        imageLoader: ImageLoader,
-        imageSaver: ImageSaver,
-        recipesStorage: RecipesStorage,
+        imageDownloader: ImageDownloaderInterface,
+        imageLoader: ImageLoaderInterface,
+        imageSaver: ImageSaverInterface,
+        recipesStorage: RecipesStorageInterface,
         logger: ToasterAndLogger) {
         val recipesDataCallbackInterface = object: RecipesCallbackInterface{ // реализация интерфейса коллбека результатов
             override fun onGotRecipesData(data: SortedMap<String, SingleRecipe>) {

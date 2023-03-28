@@ -56,14 +56,13 @@ class RecipesStorage(
         val iterator = recipes.iterator()
         while (iterator.hasNext()) {
             val recipe: SingleRecipe = iterator.next().value
-            Log.i("bugfix: recipesStorage", "saving recipe with ID = ${recipe.id}") // make toast
-
             saveSingleRecipe(recipe)
         }
-        //recipes.forEach{recipe -> saveSingleRecipe(recipe)}
     }
 
-    private fun saveSingleRecipe(recipe: SingleRecipe) {
+    override fun saveSingleRecipe(recipe: SingleRecipe) {
+        Log.i("bugfix: recipesStorage", "saving recipe with ID = ${recipe.id}") // make toast
+
         val contentValues = ContentValues()
         contentValues.put(TableConstance.KEY_ITEM.value(), recipe.id)
         contentValues.put(TableConstance.KEY_NAME.value(), recipe.name)
