@@ -49,6 +49,7 @@ class RecipesRepositoryManager(
             var resultData: SortedMap<String, SingleRecipe>? = null
             override fun hasNetRecipesResponse(jSonData: JSONArray?) { // при получении ответа
                 if (jSonData == null) {
+                    logger.printToast("Loading from server error. Loading from storage...")
                     currentData = recipesStorage.loadRecipesData() // если в коллбеке ответа нет, грузим из БД
                     recipesDataCallbackInterface.onGotRecipesData(currentData!!) // отправляем во ВМ коллбек с результатом
                 }
@@ -99,7 +100,6 @@ class RecipesRepositoryManager(
                 if (currentData!!.containsKey(recipe.id))
                     currentData!![recipe.id] = recipe
                 recipesStorage.saveSingleRecipe(recipe)
-                //saveRecipesData(currentData!!)
                 recipesDataCallbackInterface.onGotRecipesData(currentData!!)
             }
 

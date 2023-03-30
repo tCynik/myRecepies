@@ -3,6 +3,7 @@ package com.testtask.myrecipes
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -23,7 +24,7 @@ import com.testtask.myrecipes.presentation.RecipesAdapter
 import com.testtask.myrecipes.presentation.RecipeViewModel
 import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
     var myRecyclerView: RecyclerView? = null
     val recipesAdapter = RecipesAdapter()
     var recipesViewModel: RecipeViewModel? = null
@@ -47,6 +48,8 @@ class MainActivity : AppCompatActivity() {
         myRecyclerView!!.layoutManager = layoutManager
 
         myRecyclerView!!.setHasFixedSize(true) // нужно тупо для эффективности
+
+        recipesAdapter.setOnClickListener(this)
         myRecyclerView!!.adapter = recipesAdapter
 
         // инициируем ViewModel и обсервер ливдаты VM
@@ -87,5 +90,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun makeToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    override fun onItemClick(view: View, position: Int) {
+        Log.i ("bugfix: main", "item number $position in reciclerView was clicked")
     }
 }

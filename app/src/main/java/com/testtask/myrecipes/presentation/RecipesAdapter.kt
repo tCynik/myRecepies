@@ -12,6 +12,12 @@ import com.testtask.myrecipes.domain.models.SingleRecipe
 
 class RecipesAdapter: RecyclerView.Adapter<RecipesAdapter.MyViewHolder>() {
     //val numberItems: Int = 10
+    var myClickListener: OnItemClickListener? = null
+
+    fun setOnClickListener(listener: OnItemClickListener) {
+        myClickListener = listener
+    }
+
     var recipesContent = listOf<SingleRecipe>()
     set(newValue) {
         field = newValue
@@ -29,7 +35,7 @@ class RecipesAdapter: RecyclerView.Adapter<RecipesAdapter.MyViewHolder>() {
         private val carbos = itemView.findViewById<TextView>(R.id.carbos)
         private val imagePlace = itemView.findViewById<ImageView>(R.id.image_place)
 
-        fun bind(contentLine: SingleRecipe) { // функция, выполняемая при биндинге к конкретному холдеру
+        fun bindCurrentHolder(contentLine: SingleRecipe) { // функция, выполняемая при биндинге к конкретному холдеру
             name.text = contentLine.name
             headline.text = contentLine.headline
             description.text = contentLine.description
@@ -63,11 +69,19 @@ class RecipesAdapter: RecyclerView.Adapter<RecipesAdapter.MyViewHolder>() {
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         if (recipesContent.isNotEmpty()) { // если данных пока нет, биндить нечего
             val lineData = recipesContent[position]
-            holder.bind(lineData)
+            holder.bindCurrentHolder(lineData)
         }
+
+        holder.itemView.setOnClickListener {view -> val currentPosition = holder.bindingAdapterPosition
+        myClickListener!!.onItemClick(view, currentPosition)}
     }
 
     override fun getItemCount(): Int {
         return  recipesContent.size
     }
+
+    interface OnItemClickListener {
+        fun onItemClick(view: View, position: Int)
+    }
 }
+

@@ -24,6 +24,8 @@ class ImageDownloader(val errorsProcessor: ErrorsProcessor, val scope: Coroutine
             connection.connectTimeout = TIMEOUT // таймаут соединения
 
             connection.connect()
+            if (connection.responseCode != 200)
+                return null
 
             val inputStream = connection.inputStream // создаем поток ввода
             return Drawable.createFromStream(inputStream, fileName) // получаем из потока Drawable
