@@ -1,10 +1,13 @@
 package com.testtask.myrecipes
 
+import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -26,6 +29,8 @@ import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
 
 class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
     var myRecyclerView: RecyclerView? = null
+    var progressBar: ProgressBar? = null
+
     val recipesAdapter = RecipesAdapter()
     var recipesViewModel: RecipeViewModel? = null
 
@@ -42,6 +47,8 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        progressBar = findViewById(R.id.progress_bar)
 
         myRecyclerView = findViewById(R.id.recepies_recycer)
         val layoutManager = LinearLayoutManager(this)
@@ -85,14 +92,22 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
     private fun initObservers() {
         recipesViewModel!!.publicDataLive.observe(
             this,
-            Observer { recipesData -> recipesAdapter.recipesContent = recipesData })
+            Observer { recipesData ->
+                recipesAdapter.recipesContent = recipesData
+                if (progressBar!!.isVisible)
+                    progressBar!!.visibility = View.GONE
+            })
     }
 
     private fun makeToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
-    override fun onItemClick(view: View, position: Int) {
-        Log.i ("bugfix: main", "item number $position in reciclerView was clicked")
+    override fun onPictureClick(view: View, position: Int) {
+        Log.i ("bugfix: main", "picture in the item number $position in reciclerView was clicked")
+    }
+
+    override fun onTextClick(view: View, position: Int) {
+        Log.i ("bugfix: main", "text in the item number $position in reciclerView was clicked")
     }
 }

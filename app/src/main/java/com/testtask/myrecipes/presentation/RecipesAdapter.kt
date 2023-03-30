@@ -48,6 +48,14 @@ class RecipesAdapter: RecyclerView.Adapter<RecipesAdapter.MyViewHolder>() {
             placePhoto(contentLine.pre_image)
         }
 
+        fun getImageView(): View {
+            return imagePlace
+        }
+
+        fun getTextView(): View {
+            return description
+        }
+
         private fun placePhoto(pre_image: PictureModel) {
             if (pre_image.image != null) {
                 imagePlace.setImageDrawable(pre_image.image)
@@ -63,6 +71,9 @@ class RecipesAdapter: RecyclerView.Adapter<RecipesAdapter.MyViewHolder>() {
         val view = inflator.inflate(itemId, parent, false)
 
         val viewHolder = MyViewHolder(view)
+
+        val imagePlace = viewHolder.getImageView()
+        imagePlace.setOnClickListener {view -> }
         return viewHolder
     }
 
@@ -72,8 +83,16 @@ class RecipesAdapter: RecyclerView.Adapter<RecipesAdapter.MyViewHolder>() {
             holder.bindCurrentHolder(lineData)
         }
 
-        holder.itemView.setOnClickListener {view -> val currentPosition = holder.bindingAdapterPosition
-        myClickListener!!.onItemClick(view, currentPosition)}
+        holder.getImageView().setOnClickListener { view ->
+            val currentPosition = holder.bindingAdapterPosition
+            myClickListener!!.onPictureClick(view, currentPosition)
+        }
+
+        //holder.itemView.setOnClickListener { view -> // это для реагирование на просто нажатие на айтем
+        holder.getTextView().setOnClickListener { view ->
+            val currentPosition = holder.bindingAdapterPosition
+            myClickListener!!.onTextClick(view, currentPosition)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -81,7 +100,8 @@ class RecipesAdapter: RecyclerView.Adapter<RecipesAdapter.MyViewHolder>() {
     }
 
     interface OnItemClickListener {
-        fun onItemClick(view: View, position: Int)
+        fun onPictureClick(view: View, position: Int)
+        fun onTextClick(view: View, position: Int)
     }
 }
 
