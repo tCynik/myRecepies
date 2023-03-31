@@ -10,11 +10,21 @@
         android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent">
-        <ImageView
-            android:id="@+id/image_place"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="90dp"
-            android:src="@drawable/no_image"/>
+            android:layout_height="90dp">
+            <ImageView
+                android:id="@+id/image_place"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/no_image"/>
+
+            <ProgressBar
+                android:id="@+id/image_progress_bar"
+                android:layout_width="30sp"
+                android:layout_height="30sp"
+                android:layout_gravity="center"/>
+        </FrameLayout>
         <TextView
             android:id="@+id/headline"
             android:layout_width="wrap_content"

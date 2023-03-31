@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.testtask.myrecipes.R
@@ -34,6 +35,7 @@ class RecipesAdapter: RecyclerView.Adapter<RecipesAdapter.MyViewHolder>() {
         private val proteins = itemView.findViewById<TextView>(R.id.proteins)
         private val carbos = itemView.findViewById<TextView>(R.id.carbos)
         private val imagePlace = itemView.findViewById<ImageView>(R.id.image_place)
+        private val imageProgressBar = itemView.findViewById<ProgressBar>(R.id.image_progress_bar)
 
         fun bindCurrentHolder(contentLine: SingleRecipe) { // функция, выполняемая при биндинге к конкретному холдеру
             name.text = contentLine.name
@@ -59,6 +61,7 @@ class RecipesAdapter: RecyclerView.Adapter<RecipesAdapter.MyViewHolder>() {
         private fun placePhoto(pre_image: PictureModel) {
             if (pre_image.image != null) {
                 imagePlace.setImageDrawable(pre_image.image)
+                imageProgressBar.visibility = View.GONE
             }
         }
     }
