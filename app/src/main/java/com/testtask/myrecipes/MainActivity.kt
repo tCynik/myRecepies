@@ -1,6 +1,6 @@
 package com.testtask.myrecipes
 
-import android.opengl.Visibility
+import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -23,6 +23,7 @@ import com.testtask.myrecipes.data.storage.RecipesStorage
 import com.testtask.myrecipes.data.storage.image_load_save.ImageLoader
 import com.testtask.myrecipes.data.storage.image_load_save.ImageSaver
 import com.testtask.myrecipes.domain.ErrorsProcessor
+import com.testtask.myrecipes.presentation.ImageFragment
 import com.testtask.myrecipes.presentation.RecipesAdapter
 import com.testtask.myrecipes.presentation.RecipeViewModel
 import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
@@ -33,6 +34,9 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
 
     val recipesAdapter = RecipesAdapter()
     var recipesViewModel: RecipeViewModel? = null
+
+    var fragmentsPlace: View? = null
+    val pictureFragment = ImageFragment()
 
     val logger = object : ToasterAndLogger {
         override fun printToast(message: String) {
@@ -47,6 +51,8 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        fragmentsPlace = findViewById(R.id.fragments_place)
 
         progressBar = findViewById(R.id.progress_bar)
 
@@ -104,10 +110,23 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
     }
 
     override fun onPictureClick(view: View, position: Int) {
+        val picture = recipesViewModel!!.publicDataLive.value?.get(position)!!.pre_image.image
+        val recipeName = recipesViewModel!!.publicDataLive.value?.get(position)!!.name
+        openPictureFragment(picture!!, recipeName)
         Log.i ("bugfix: main", "picture in the item number $position in reciclerView was clicked")
     }
 
     override fun onTextClick(view: View, position: Int) {
         Log.i ("bugfix: main", "text in the item number $position in reciclerView was clicked")
     }
+
+    private fun openPictureFragment(picture: Drawable, recipeName: String) {
+        pictureFragment.setImage(picture)
+        pictureFragment.setRecipeName(recipeName)
+        val fTrans = supportFragmentManager.beginTransaction()
+        fTrans.add(R.id.fragments_place, pictureFragment)
+        fTrans.addToBackStack(null)
+        fTrans.commit()
+    }
+
 }
