@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.testtask.myrecipes.MainActivity
 import com.testtask.myrecipes.data.interfaces.ImageDownloaderInterface
 import com.testtask.myrecipes.data.interfaces.ImageLoaderInterface
 import com.testtask.myrecipes.data.interfaces.ImageSaverInterface
@@ -30,6 +31,8 @@ class RecipeViewModel: ViewModel() {
     val errorProcessor = ErrorsProcessor() // для вывода ошибок на UI
     val constantsURLSet = URLConstantsSet(baseURL = BASE_URL, recipesList = RECIPES_LIST) // данные для формирования запроса из предсхраненных оций
     var repositoryManager: RecipesRepositoryManager? = null // инстанс класса, отвечающий со всеми отношениями с данынми, памятью, сетью, и т.д.
+
+    var fragmentRecipesCallback: MainActivity.RecipeFragmentCallback? = null
 
     fun initRepositoryManager( // передача зависимостей. Производится либо после запуска приложения, либо вручную при тестировании
         imageDownloader: ImageDownloaderInterface,
@@ -61,5 +64,21 @@ class RecipeViewModel: ViewModel() {
     fun updateDataWhenActivityCreated() {
         if (recipesDataLive.value == null)
             repositoryManager?.updateData()
+    }
+
+    fun setFragmentCallback(callback: MainActivity.RecipeFragmentCallback) {
+        this.fragmentRecipesCallback = callback
+    }
+
+    fun pictureWasClicked(position: Int) { // получили команду о нажатии на картинку
+        val recipe = recipesDataLive.value?.get(position)
+
+        // запускаем фрагмент с данными
+        val picture = recipe!!.pre_image.image
+        val name = recipe!!.name
+        fragmentRecipesCallback!!.setRecipeScreen(picture!!, name)
+
+        // запрашиваем обновление картинки
+        repositoryManager!!.getRecipeFullPicture(recipe)
     }
 }

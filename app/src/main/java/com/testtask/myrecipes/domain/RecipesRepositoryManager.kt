@@ -79,6 +79,10 @@ class RecipesRepositoryManager(
         recipesStorage.saveRecipesData(currentData)
     }
 
+    fun getRecipeFullPicture(recipe: SingleRecipe){
+        scope.async { updateSinglePhoto(recipe, isFull = true) }
+    }
+
     // по получаемому из активити репозиториям отрабатываем варианты загрузки
     fun updateData(): List<SingleRecipe> {
         // todo: сначала обращаемся в инет за информацией. Если нет интернета, выводим тост о том, что коннекта нема
@@ -130,7 +134,12 @@ class RecipesRepositoryManager(
     private fun updatePhotos(){
         val iterator = currentData!!.iterator()
         while (iterator.hasNext()) {
-            scope.async (Dispatchers.IO) {imagesDataDirector.getImage(recipe = iterator.next().value, isFull = false)}
+            //scope.async (Dispatchers.IO) {imagesDataDirector.getImage(recipe = iterator.next().value, isFull = false)}
+            scope.async (Dispatchers.IO) {updateSinglePhoto(recipe = iterator.next().value, isFull = false)}
         }
+    }
+
+    private fun updateSinglePhoto(recipe: SingleRecipe, isFull: Boolean) {
+        imagesDataDirector.getImage(recipe = recipe, isFull = isFull)
     }
 }

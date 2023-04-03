@@ -62,7 +62,8 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
 
         myRecyclerView!!.setHasFixedSize(true) // нужно тупо для эффективности
 
-        recipesAdapter.setOnClickListener(this)
+        recipesAdapter.setOnClickListener(this) // передаем слушатель нажатий в адаптер для взаимодействия с элементами списка
+
         myRecyclerView!!.adapter = recipesAdapter
 
         // инициируем ViewModel и обсервер ливдаты VM
@@ -83,6 +84,9 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
             recipesStorage = storageRepository,
             logger = logger
         )
+
+        recipesViewModel!!.setFragmentCallback(getRecipeFragmentCallback())
+
 
         // запуск обновления данных
         recipesViewModel!!.updateDataWhenActivityCreated() // инициируем обновление данных
@@ -110,9 +114,11 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
     }
 
     override fun onPictureClick(view: View, position: Int) {
-        val picture = recipesViewModel!!.publicDataLive.value?.get(position)!!.pre_image.image
-        val recipeName = recipesViewModel!!.publicDataLive.value?.get(position)!!.name
-        openPictureFragment(picture!!, recipeName)
+        recipesViewModel!!.pictureWasClicked(position) // VM сама решает, что делать с инфой о нажатии на картинку
+        //________________________ временное прямое решение, делаем через VM
+//        val picture = recipesViewModel!!.publicDataLive.value?.get(position)!!.pre_image.image
+//        val recipeName = recipesViewModel!!.publicDataLive.value?.get(position)!!.name
+//        openPictureFragment(picture!!, recipeName)
         Log.i ("bugfix: main", "picture in the item number $position in reciclerView was clicked")
     }
 
@@ -127,6 +133,24 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
         fTrans.add(R.id.fragments_place, pictureFragment)
         fTrans.addToBackStack(null)
         fTrans.commit()
+    }
+
+    private fun getRecipeFragmentCallback(): RecipeFragmentCallback {
+        return object: RecipeFragmentCallback {
+            override fun setRecipeScreen(picture: Drawable, name: String) { // первичная установка фрагмента
+                openPictureFragment(picture, name)
+            }
+
+            override fun updateRecipeScreen(picture: Drawable) { // замена картинки (при скачивании)
+                pictureFragment.setImage(picture)
+            }
+        }
+    }
+
+    interface RecipeFragmentCallback { // интерфейс дл отображения во фрагменте информации
+        fun setRecipeScreen(picture: Drawable, name: String)
+
+        fun updateRecipeScreen(picture: Drawable)
     }
 
 }

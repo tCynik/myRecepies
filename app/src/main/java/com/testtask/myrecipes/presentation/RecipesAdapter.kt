@@ -13,7 +13,7 @@ import com.testtask.myrecipes.domain.models.SingleRecipe
 
 class RecipesAdapter: RecyclerView.Adapter<RecipesAdapter.MyViewHolder>() {
     //val numberItems: Int = 10
-    var myClickListener: OnItemClickListener? = null
+    var myClickListener: OnItemClickListener? = null // clickListener для взаимодействия с элементами списка
 
     fun setOnClickListener(listener: OnItemClickListener) {
         myClickListener = listener
