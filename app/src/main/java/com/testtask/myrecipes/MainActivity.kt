@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
     var recipesViewModel: RecipeViewModel? = null
 
     var fragmentsPlace: View? = null
-    val pictureFragment = ImageFragment()
+    val pictureFragment = ImageFragment(this)
 
     val logger = object : ToasterAndLogger {
         override fun printToast(message: String) {
@@ -53,7 +53,6 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
         setContentView(R.layout.activity_main)
 
         fragmentsPlace = findViewById(R.id.fragments_place)
-
         progressBar = findViewById(R.id.progress_bar)
 
         myRecyclerView = findViewById(R.id.recepies_recycer)
@@ -68,6 +67,8 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
 
         // инициируем ViewModel и обсервер ливдаты VM
         recipesViewModel = ViewModelProvider(this).get(RecipeViewModel::class.java)
+
+        pictureFragment.setViewModel(recipesViewModel!!)
 
         // готовим интерфейсы репозиториев для работы с контекстом при обновлении информации
         val storageRepository: RecipesStorageInterface = RecipesStorage(this, DataBaseHelper(this), logger = logger)
@@ -115,10 +116,6 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
 
     override fun onPictureClick(view: View, position: Int) {
         recipesViewModel!!.pictureWasClicked(position) // VM сама решает, что делать с инфой о нажатии на картинку
-        //________________________ временное прямое решение, делаем через VM
-//        val picture = recipesViewModel!!.publicDataLive.value?.get(position)!!.pre_image.image
-//        val recipeName = recipesViewModel!!.publicDataLive.value?.get(position)!!.name
-//        openPictureFragment(picture!!, recipeName)
         Log.i ("bugfix: main", "picture in the item number $position in reciclerView was clicked")
     }
 
@@ -126,31 +123,30 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
         Log.i ("bugfix: main", "text in the item number $position in reciclerView was clicked")
     }
 
-    private fun openPictureFragment(picture: Drawable, recipeName: String) {
-        pictureFragment.setImage(picture)
-        pictureFragment.setRecipeName(recipeName)
-        val fTrans = supportFragmentManager.beginTransaction()
-        fTrans.add(R.id.fragments_place, pictureFragment)
-        fTrans.addToBackStack(null)
-        fTrans.commit()
-    }
+//    private fun openPictureFragment(picture: Drawable, recipeName: String) {
+//        pictureFragment.setImage(picture)
+//        pictureFragment.setRecipeName(recipeName)
+//        val fTrans = supportFragmentManager.beginTransaction()
+//        fTrans.add(R.id.fragments_place, pictureFragment)
+//        fTrans.addToBackStack(null)
+//        fTrans.commit()
+//    }
 
     private fun getRecipeFragmentCallback(): RecipeFragmentCallback {
         return object: RecipeFragmentCallback {
-            override fun setRecipeScreen(picture: Drawable, name: String) { // первичная установка фрагмента
-                openPictureFragment(picture, name)
-            }
-
-            override fun updateRecipeScreen(picture: Drawable) { // замена картинки (при скачивании)
-                pictureFragment.setImage(picture)
+            override fun setRecipeIntoFragmentByNumber(recipeNumber: Int?) {
+                Log.i("bugfix: main", "called callback for item number $recipeNumber")
+                recipesViewModel!!.setCurrentNumber(recipeNumber)
+                val fTrans = supportFragmentManager.beginTransaction()
+                fTrans.add(R.id.fragments_place, pictureFragment)
+                fTrans.addToBackStack(null)
+                fTrans.commit()
             }
         }
     }
 
     interface RecipeFragmentCallback { // интерфейс дл отображения во фрагменте информации
-        fun setRecipeScreen(picture: Drawable, name: String)
-
-        fun updateRecipeScreen(picture: Drawable)
+        fun setRecipeIntoFragmentByNumber(recipeNumber: Int?)
     }
 
 }

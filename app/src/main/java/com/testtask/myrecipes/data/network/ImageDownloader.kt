@@ -15,6 +15,7 @@ class ImageDownloader(val errorsProcessor: ErrorsProcessor, val scope: Coroutine
 
     override fun downloadPicture (addressURL: String, fileName: String): Drawable? {
         try {
+            Log.i("bugfix: imageDownloader", "downloading image from address $addressURL")
             // создаем соединение
             val url = URL(addressURL)
             // устанавливаем соединение URLConnection, затем кастим его в HttpUTLConnection

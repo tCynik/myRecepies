@@ -34,6 +34,7 @@ class ImagesDataDirector(
 ) { //
 
     fun getImage(recipe: SingleRecipe, isFull: Boolean) {
+
         var localAddress = ""
         var networkAddress = ""
         if (isFull) {
@@ -43,6 +44,7 @@ class ImagesDataDirector(
             localAddress = recipe.pre_image.localAddress
             networkAddress = recipe.pre_image.networkAddress
         }
+        Log.i ("bugfix: DataDirector", "getting image for recipe ${recipe.id}, is full = $isFull, network address = $networkAddress")
 
         var picture: Drawable?
         var fileName = recipe.id // будущее имя файла
@@ -57,19 +59,18 @@ class ImagesDataDirector(
         fileName = FileNameGenerator().getName(fileName, isFull)
 
         picture = imageDownloader.downloadPicture(networkAddress, fileName) // качаем фото из сети
+        Log.i ("bugfix: DataDirector", "the picture downloaded correctly - ${picture != null} ")
 
         if (picture != null) { // если скачали из сети успешно, сохраняем фото
             val localAddress = imageSager.saveImage(image = picture, fileName = fileName)
-            Log.i("bugfix: ImagesDataDirector", "image ${recipe.id} was downloaded, saved to $localAddress")
+            Log.i("bugfix: ImagesDataDirector", "image ${recipe.id} full = $isFull was downloaded, saved to $localAddress")
             if (localAddress != NO_LOCAL_IMAGE_PATTERN) {// если сохранение успешно, то с учетом записи адреса файла
-                resultRecipe = picture?.let {
-                    updateRecipe( // обновляем рецепт
-                        recipe = recipe,
-                        picture = it,
-                        localAddress = localAddress,
-                        isFull = isFull
-                    )
-                }
+                resultRecipe = updateRecipe( // обновляем рецепт
+                    recipe = recipe,
+                    picture = picture,
+                    localAddress = localAddress,
+                    isFull = isFull
+                )
 
                 imageCallback.updateRecipeItemAndSave(resultRecipe!!)
             }

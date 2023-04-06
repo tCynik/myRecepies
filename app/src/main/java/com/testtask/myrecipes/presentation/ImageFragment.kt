@@ -2,12 +2,15 @@ package com.testtask.myrecipes.presentation
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.ViewModel
+import com.testtask.myrecipes.MainActivity
 import com.testtask.myrecipes.R
 
 // TODO: Rename parameter arguments, choose names that match
@@ -20,7 +23,8 @@ private const val ARG_PARAM2 = "param2"
  * Use the [ImageFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class ImageFragment : Fragment() {
+class ImageFragment(val context: MainActivity) : Fragment() { // контекст передается для обеспечения вызова runOnUiThread
+    private var viewModel: RecipeViewModel? = null
 
     private var imagePlace: ImageView? = null
     private var textPlace: TextView? = null
@@ -47,9 +51,17 @@ class ImageFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_image, container, false)
         imagePlace = view.findViewById(R.id.recipe_picture)
         textPlace = view.findViewById(R.id.recipe_name)
-
-        imagePlace!!.setImageDrawable(recipeImage!!)
-        textPlace!!.text = recipeName
+        viewModel!!.publicCurrentRecipeLive.observe(viewLifecycleOwner) { singleRecipe ->
+            if (singleRecipe != null) {// context.runOnUiThread {
+                // todo: попробовать запустить без runOnUiThread, по идее должна выпадать ошибка обращения к UI не из главного потока
+                val name = singleRecipe.name
+                var picture = singleRecipe.full_image.image
+                Log.i("bugfix: ImageFragment", "ready to show picture full = ${picture!=null}")
+                if (picture == null) picture = singleRecipe.pre_image.image
+                imagePlace!!.setImageDrawable(picture)
+                textPlace!!.text = name
+            }
+        }
         return view
     }
 
@@ -64,13 +76,17 @@ class ImageFragment : Fragment() {
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ImageFragment().apply {
+        fun newInstance(param1: String, param2: String, context: MainActivity) =
+            ImageFragment(context).apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)
                 }
             }
+    }
+
+    fun setViewModel(viewModel: RecipeViewModel) {
+        this.viewModel = viewModel
     }
 
     fun setImage(image: Drawable) {

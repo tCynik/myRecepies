@@ -80,7 +80,8 @@ class RecipesRepositoryManager(
     }
 
     fun getRecipeFullPicture(recipe: SingleRecipe){
-        scope.async { updateSinglePhoto(recipe, isFull = true) }
+        Log.i("bugfix: RepoManager", "getFullRecipe was called")
+        scope.async(Dispatchers.IO) { updateSinglePhoto(recipe, isFull = true) }
     }
 
     // по получаемому из активити репозиториям отрабатываем варианты загрузки
@@ -101,6 +102,7 @@ class RecipesRepositoryManager(
         return object: ImageDownloadingCallback { // коллбек для обновления даты при получении изображения.
             override fun updateRecipeItemAndSave(recipe: SingleRecipe) {
                 // todo: каждый раз вызывает notifyDataSetChanged() - оптимизировать на notifyItemSetChanged()
+                Log.i("bugfix: repository manager", "updating & saving. full picture local address = ${recipe.full_image.localAddress}")
                 if (currentData!!.containsKey(recipe.id))
                     currentData!![recipe.id] = recipe
                 recipesStorage.saveSingleRecipe(recipe)
