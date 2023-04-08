@@ -21,7 +21,7 @@ import java.net.URL
  */
 
 const val TIMEOUT = 1000
-class RecipesRequestMaker(
+class RecipesRemoteRequestMaker(
     val logger: ToasterAndLogger,
     val scope: CoroutineScope,
     val resultCallback: RecipesNetRepositoryInterface
@@ -33,9 +33,6 @@ class RecipesRequestMaker(
             withContext(Dispatchers.Default) {
                 result = updateFromNet(url)
                 resultCallback.hasNetRecipesResponse(result)
-//                result?.let {
-//                    Log.i("bugfix: recipesRequestMaker", "making callback with recipes")
-//                    resultCallback.hasNetRecipesResponse(it) }
             }
         }
         return result

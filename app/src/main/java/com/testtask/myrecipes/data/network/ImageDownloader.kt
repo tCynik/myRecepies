@@ -27,10 +27,10 @@ class ImageDownloader(val errorsProcessor: ErrorsProcessor, val scope: Coroutine
             connection.connect()
             if (connection.responseCode != 200)
                 return null
-
-            val inputStream = connection.inputStream // создаем поток ввода
-            return Drawable.createFromStream(inputStream, fileName) // получаем из потока Drawable
-
+            else {
+                val inputStream = connection.inputStream // создаем поток ввода
+                return Drawable.createFromStream(inputStream, fileName) // получаем из потока Drawable
+            }
         } catch (e: MalformedURLException) {
             errorsProcessor.printError("ImageDownloader: invalid URL: $addressURL, Error = $e")
             Log.i("bugfix:imageDownloader", "connection has an error = $e")

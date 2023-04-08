@@ -12,7 +12,7 @@ import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
 
 
 /**
- * класс отвечает за управление асинхронной загрузкой-сохранением фоток,
+ * класс отвечает за управление загрузкой-сохранением фоток,
  * а так же за проверку наличия фоток в памяти???
  * В зависимости от выбранного варианта работаем для полной картинки или предварительной
  * действия производятся асинхронно, поэтому вывод результата через коллбек по готовности
@@ -34,7 +34,7 @@ class ImagesDataDirector(
 ) { //
 
     fun getImage(recipe: SingleRecipe, isFull: Boolean) {
-
+        // формируем транскрипцию локальных и удаленных адресов для дальнейшей работы
         var localAddress = ""
         var networkAddress = ""
         if (isFull) {
@@ -59,7 +59,7 @@ class ImagesDataDirector(
         fileName = FileNameGenerator().getName(fileName, isFull)
 
         picture = imageDownloader.downloadPicture(networkAddress, fileName) // качаем фото из сети
-        Log.i ("bugfix: DataDirector", "the picture downloaded correctly - ${picture != null} ")
+        Log.i ("bugfix: DataDirector", "the picture download ended. Picture downloaded - ${picture != null}, is full = $isFull ")
 
         if (picture != null) { // если скачали из сети успешно, сохраняем фото
             val localAddress = imageSager.saveImage(image = picture, fileName = fileName)
@@ -71,7 +71,7 @@ class ImagesDataDirector(
                     localAddress = localAddress,
                     isFull = isFull
                 )
-
+                // сохраняем измененный рецепт, обновляем данные о нем в UI
                 imageCallback.updateRecipeItemAndSave(resultRecipe!!)
             }
 

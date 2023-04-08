@@ -3,11 +3,7 @@ package com.testtask.myrecipes.domain
 import android.util.Log
 import com.testtask.myrecipes.data.interfaces.*
 import com.testtask.myrecipes.data.network.*
-import com.testtask.myrecipes.data.network.ImageDownloader
 import com.testtask.myrecipes.data.network.models.ResponseJsonArray
-import com.testtask.myrecipes.data.storage.RecipesStorage
-import com.testtask.myrecipes.data.storage.image_load_save.ImageLoader
-import com.testtask.myrecipes.data.storage.image_load_save.ImageSaver
 import com.testtask.myrecipes.domain.interfaces.ImageDownloadingCallback
 import com.testtask.myrecipes.domain.models.SingleRecipe
 import com.testtask.myrecipes.presentation.interfaces.RecipesCallbackInterface
@@ -19,6 +15,8 @@ import java.util.*
 /**
  * Класс, ответственный за упарвлением получением данных. Он решает, какие запросы направлять
  * на сервер, какиее - в Storage.
+ * Содержит ImagesDataDirector, отвечающий за управление загрузкой-сохранением изображений локально, и из сети.
+ * запросы в ImagesDataDirector из этого класса направляем асинхронно
  */
 
 class RecipesRepositoryManager(
@@ -35,7 +33,7 @@ class RecipesRepositoryManager(
     private var currentData: SortedMap<String, SingleRecipe>? = null // текущие данные, согласно последнему обновлению
 
     private val parser = ParserJson() // парсинг ответа из JSONArray
-    private var requestMaker: RecipesRequestMaker? = null // инстанс, отвечающий за формирование запроса
+    private var requestMaker: RecipesRemoteRequestMaker? = null // инстанс, отвечающий за формирование запроса
 
     private val imagesDataDirector = ImagesDataDirector(
         imageCallback = updateViewWithImageCallback(),
@@ -44,16 +42,16 @@ class RecipesRepositoryManager(
         imageDownloader = imageDownloader,
         logger = logger)
 
-    init {
+    init { // тут мы создаем инстанс запроса в сеть о рецептах. Короутина вызывается внутри класса, поэтому результат возвращается через коллбек. Черезжопно, но оставлено для примера возможного решения
         val recipesNetCallbackInterface = object : RecipesNetRepositoryInterface { // коллбек для возврата результата при его получении
             var resultData: SortedMap<String, SingleRecipe>? = null
             override fun hasNetRecipesResponse(jSonData: JSONArray?) { // при получении ответа
-                if (jSonData == null) {
+                if (jSonData == null) { // ответ пустой, т.е. не получили книгу рецептов
                     logger.printToast("Loading from server error. Loading from storage...")
-                    currentData = recipesStorage.loadRecipesData() // если в коллбеке ответа нет, грузим из БД
+                    currentData = recipesStorage.loadRecipesData() // грузим рецепты из БД
                     recipesDataCallbackInterface.onGotRecipesData(currentData!!) // отправляем во ВМ коллбек с результатом
                 }
-                else { // если ответ есть, грузим из сети
+                else { // если ответ есть, расшифровываем полученное из сети
                     resultData = parser.parseJson(ResponseJsonArray(jSonData!!)) // парсим ответ в формат List<SingleRecipe>
                     if (currentData == null) { // если в эту сессию это у нас первый результат
                         currentData = resultData // сохраняем значения в инстанс сессии
@@ -66,12 +64,14 @@ class RecipesRepositoryManager(
 
                 }
 
-                if (currentData == null) noNetRecipesData()
+                if (currentData == null) noNetRecipesData() //todo: double local data loading calling!
+                // todo: вызов загрузки из памяти идет дважды - и строчкой выше, и в рамках  обработки jsonData == null в блоке кода наверху
+
                 else updatePhotos()
             }
         }
         // инстанс, отвечающий за URL запрос, в конструктор получает реализацию интерфейса для коллбека
-        requestMaker = RecipesRequestMaker(logger, scope, recipesNetCallbackInterface)
+        requestMaker = RecipesRemoteRequestMaker(logger, scope, recipesNetCallbackInterface)
     }
 
     private fun saveRecipesData(currentData: SortedMap<String, SingleRecipe>) {

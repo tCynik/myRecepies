@@ -108,6 +108,11 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
                 if (progressBar!!.isVisible)
                     progressBar!!.visibility = View.GONE
             })
+
+        recipesViewModel!!.publicCurrentRecipeLive.observe(
+            this,
+            {currentRecipe -> Log.i("bugfix - mainActivity", "CURRENT RECIPE DATA UPDATED. Full picture exist = ${currentRecipe!!.full_image.image != null}")}
+        )
     }
 
     private fun makeToast(message: String) {
