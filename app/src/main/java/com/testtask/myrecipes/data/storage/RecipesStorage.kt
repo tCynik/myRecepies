@@ -12,7 +12,7 @@ import java.util.*
 /**
  * класс для работы с внутренней бД
  * Сохранение-загрузка таблицы рецептов происходит с помощью SQLite
- * база работает ТОЛЬКО с памятью рецептов, не включая фотки. Фотки подключаются пакетом image_load_save
+ * база работает ТОЛЬКО с памятью рецептов, самы файлы фоток сохраняются отдельно, в рецепте только адреса. Фотки подключаются пакетом image_load_save
  */
 
 class RecipesStorage(
@@ -61,7 +61,7 @@ class RecipesStorage(
     }
 
     override fun saveSingleRecipe(recipe: SingleRecipe) {
-        Log.i("bugfix: recipesStorage", "saving recipe with ID = ${recipe.id}") // make toast
+        Log.i("bugfix: recipesStorage", "saving recipe with ID = ${recipe.id}, has fullPicture address = ${recipe.full_image.localAddress}") // make toast
 
         val contentValues = ContentValues()
         contentValues.put(TableConstance.KEY_ITEM.value(), recipe.id)

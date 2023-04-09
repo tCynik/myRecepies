@@ -2,7 +2,9 @@ package com.testtask.myrecipes.data.network
 
 import android.util.Log
 import com.testtask.myrecipes.data.interfaces.RecipesNetRepositoryInterface
-import com.testtask.myrecipes.domain.ErrorsProcessor
+import com.testtask.myrecipes.data.network.models.ResponseAbstract
+import com.testtask.myrecipes.data.network.models.ResponseJsonArray
+import com.testtask.myrecipes.domain.models.SingleRecipe
 import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
 import kotlinx.coroutines.*
 import org.json.JSONArray
@@ -13,6 +15,7 @@ import java.lang.StringBuilder
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
+import java.util.*
 
 /**
  * Класс, ответственный за направление запроса и асинхронное получение ответа от сервера
@@ -31,14 +34,21 @@ class RecipesRemoteRequestMaker(
         var result: JSONArray? = null
         scope.launch {
             withContext(Dispatchers.Default) {
-                result = updateFromNet(url)
+                result = getJsonFromNet(url)
                 resultCallback.hasNetRecipesResponse(result)
             }
         }
         return result
     }
 
-    private fun updateFromNet(addressURL: String): JSONArray? { // метод асинхронного обращени к серверу
+    fun updateRecipesFromNet(url: String): SortedMap<String, SingleRecipe>? {
+        val resultJsonArray = getJsonFromNet(url)
+
+        return if (resultJsonArray != null) ParserJson().parseJson(ResponseJsonArray(resultJsonArray))
+        else null
+    }
+
+    private fun getJsonFromNet(addressURL: String): JSONArray? { // метод асинхронного обращени к серверу
         val url = URL(addressURL)
         val connection: HttpURLConnection
         connection = url.openConnection() as HttpURLConnection

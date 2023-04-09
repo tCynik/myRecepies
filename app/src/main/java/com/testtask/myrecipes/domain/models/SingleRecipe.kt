@@ -50,5 +50,28 @@ data class SingleRecipe(
             pre_image = pre_imageNew)
     }
 
+    override fun equals(other: Any?): Boolean {
+        var isEquals = true
+        if (other is SingleRecipe) {
+            if (other.id != this.id) isEquals = false
+            if (other.name != this.name) isEquals = false
+            if (other.description != this.description) isEquals = false
+            if (other.headline != this.headline) isEquals = false
+            if (other.difficulty != this.difficulty) isEquals = false
+            if (other.calories != this.calories) isEquals = false
+            if (other.fats != this.fats) isEquals = false
+            if (other.proteins != this.proteins) isEquals = false
+            if (other.carbos != this.carbos) isEquals = false
+            if (other.cookingTime != this.cookingTime) isEquals = false
+            if (other.full_image.networkAddress != this.full_image.networkAddress) isEquals = false
+            if (other.pre_image.networkAddress != this.pre_image.networkAddress) isEquals = false
+            return isEquals
+        } else return false
+    }
+
+    override fun hashCode(): Int {
+        return this.id.hashCode()
+    }
+
     // todo: descriprion is long text, maby an other type?
 }
