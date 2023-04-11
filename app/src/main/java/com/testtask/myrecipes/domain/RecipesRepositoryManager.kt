@@ -67,7 +67,7 @@ class RecipesRepositoryManager(
                 if (currentData == null) noNetRecipesData() //todo: double local data loading calling!
                 // todo: вызов загрузки из памяти идет дважды - и строчкой выше, и в рамках  обработки jsonData == null в блоке кода наверху
 
-                else updatePhotos()
+                else updatePhotos(currentData!!)
             }
         }
         // инстанс, отвечающий за URL запрос, в конструктор получает реализацию интерфейса для коллбека
@@ -85,7 +85,7 @@ class RecipesRepositoryManager(
     }
 
     // по получаемому из активити репозиториям отрабатываем варианты загрузки
-    fun updateData(): List<SingleRecipe> {
+    fun updateData() {
         /**
          * Порядок обновления книги рецептов:
          * Асинхронно качаем книгу из БД, и пытаемся взять из сети.
@@ -104,6 +104,7 @@ class RecipesRepositoryManager(
         var hasRemoteResponse = false
 
         var remoteData: SortedMap<String, SingleRecipe>? = null
+        var localData: SortedMap<String, SingleRecipe>? = null
 
         // направляем асинхронный запрос в сеть
         val requestURL = URLMaker(constantsURLSet).makeURLRecipesList() // формируем запрос
@@ -112,41 +113,61 @@ class RecipesRepositoryManager(
             hasRemoteResponse = true // выставлям флаг того, что ответ от запроса есть
             if (remoteData != null) { // если ответ не налловый
                 if (hasLocalResponse) { // если уже есть ответ ответ из БД
-                    // сравниваем, сохраняем разницу, обновляем книгу на экране
+                    if (localData != null) { // если локальнаая дата пуста, в памяти пока нет ничего
+                        recipesDataCallbackInterface.onGotRecipesData(remoteData!!) // выводим что загрузили
+                        saveRecipesData(remoteData!!)
+                        updatePhotos(remoteData!!)
+                    } else {
+                        val updatedData = ComparatorCombinator().compareAndCombineMaps(
+                            comparableMap = localData!!,
+                            updaterMap = remoteData!!)//todo: сравниваем, сохраняем разницу, обновляем книгу на экране
+                        if (updatedData != remoteData) {
+                            recipesDataCallbackInterface.onGotRecipesData(remoteData!!) // выводим что загрузили
+                            saveRecipesData(remoteData!!)
+                            updatePhotos(remoteData!!)
+                        }
+                    }
                 } else { // если ответа из БД еще нет
-                    // выводим что загрузили
+                    recipesDataCallbackInterface.onGotRecipesData(remoteData!!)
+                    updatePhotos(remoteData!!) // выводим что загрузили, идем качать фотки
                 }
             } else { // если ответ налловый = доступа к сети нет
                 if (hasLocalResponse) { // сети нет, есть только локальный ответ
-                    // если при этом локальные данные налловые, пишем что ошибка (выводим заглушку?)
-                    // но если данные неналловые, просто пишем тост что нет доступа к сети
+                    if (localData != null) {// если при этом локальные данные налловые,
+                        logger.printToast("No data")// todo: (выводим заглушку?)
+                    } else { // но если данные неналловые,
+                        logger.printToast("Network connection error") // просто пишем тост что нет доступа к сети
+                    }
                 } else { // данные из сети налловые, а данных из локальной БД еще нет
-                    // просто пишем тост что нет доступа к сети
+                    logger.printToast("Network connection error")
                 }
             }
         }
-
-        val localData: List<SingleRecipe>? = null
 
         // направляем асинхронный запрос на чтение БД
         scope.launch (Dispatchers.IO) {
             val loadedData = recipesStorage.loadRecipesData() // грузим рецепты из БД
             hasLocalResponse = true
             if (loadedData != null) { // если есть неналловый результат из локальной базы
+                localData = loadedData
                 if (hasRemoteResponse) { // если ранее получили результат из сети
-                    // сравниваем, и только сохраняем разницу
+                    //todo: сравниваем, и только сохраняем разницу
                 } else { // если результата из сети пока нет
-                    // выводим что загрузили
+                    recipesDataCallbackInterface.onGotRecipesData(remoteData!!) // выводим что загрузили
+                    updatePhotos(remoteData!!)
                 }
             } else { // если результат из локальной базы налловый
                 if (hasRemoteResponse) { // если локального результата нет, но есть результат с сервера
-                    // если при этом результат и сети неналловый, сохраняем его в базу
-                    // если результат из сети налл, пишем ошику, либо ставим заглушку
-                } else { // если нет локального результата и результата с сервера
-                    // сохраняем результат из сервера в локальную базу
+                    if (remoteData != null) { // если при этом результат из сети неналловый
+                        saveRecipesData(remoteData!!)// сохраняем его в базу
+                    } else { // либо если налл,
+                        logger.printToast("No data") //todo: если результат из сети налл, пишем ошику, либо ставим заглушку
+                    }
+                } else { // если локальный результат налл, а из сети ответа пока еще нет, делаем ничего
+                    logger.printLog("Database is empty. Awaiting network result...")
                 }
             }
-
+//return listOf()//resultData
         }
 
 
@@ -158,8 +179,6 @@ class RecipesRepositoryManager(
         // создание и обработка запроса данных из сети
         //val requestURL = URLMaker(constantsURLSet).makeURLRecipesList() // формируем запрос
 //        requestMaker!!.makeAsyncRequest(requestURL)
-
-        return listOf()//resultData
     }
 
     private fun updateViewWithImageCallback(): ImageDownloadingCallback {
@@ -197,8 +216,8 @@ class RecipesRepositoryManager(
     // make toast
     }
 
-    private fun updatePhotos(){
-        val iterator = currentData!!.iterator()
+    private fun updatePhotos(recipesData: SortedMap<String, SingleRecipe>){
+        val iterator = recipesData.iterator()
         while (iterator.hasNext()) {
             //scope.async (Dispatchers.IO) {imagesDataDirector.getImage(recipe = iterator.next().value, isFull = false)}
             scope.async (Dispatchers.IO) {updateSinglePhoto(recipe = iterator.next().value, isFull = false)}

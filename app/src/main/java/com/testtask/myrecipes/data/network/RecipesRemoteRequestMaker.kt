@@ -43,7 +43,6 @@ class RecipesRemoteRequestMaker(
 
     fun updateRecipesFromNet(url: String): SortedMap<String, SingleRecipe>? {
         val resultJsonArray = getJsonFromNet(url)
-
         return if (resultJsonArray != null) ParserJson().parseJson(ResponseJsonArray(resultJsonArray))
         else null
     }
