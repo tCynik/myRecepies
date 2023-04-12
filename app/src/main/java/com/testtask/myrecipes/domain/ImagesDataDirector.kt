@@ -51,7 +51,7 @@ class ImagesDataDirector(
 
         picture = imageLoader.loadImageByFileAddress(localAddress)
         if (picture != null) {
-            Log.i("bugfix: ImagesDataDirector", "image ${recipe.id} was not downloaded, loading one from local")
+            Log.i("bugfix: ImagesDataDirector", "image ${recipe.id} was loaded from local, updating")
             resultRecipe = updateRecipe(
                 recipe = recipe,
                 picture = picture,
@@ -61,10 +61,11 @@ class ImagesDataDirector(
             imageCallback.updateRecipeItemNoSave(resultRecipe!!) // пошел коллбек с результатом
 
         } else {
+            Log.i("bugfix: ImagesDataDirector", "loading image ${recipe.id} from local is failed, starting load one from net")
+
             fileName = FileNameGenerator().getName(fileName, isFull)
 
-            picture =
-                imageDownloader.downloadPicture(networkAddress, fileName) // качаем фото из сети
+            picture = imageDownloader.downloadPicture(networkAddress, fileName) // качаем фото из сети
             Log.i(
                 "bugfix: DataDirector",
                 "the picture download ended. Picture downloaded - ${picture != null}, is full = $isFull "

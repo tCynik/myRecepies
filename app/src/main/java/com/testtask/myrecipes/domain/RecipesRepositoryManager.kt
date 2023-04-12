@@ -107,31 +107,38 @@ class RecipesRepositoryManager(
         var localData: SortedMap<String, SingleRecipe>? = null
 
         // направляем асинхронный запрос в сеть
-        val requestURL = URLMaker(constantsURLSet).makeURLRecipesList() // формируем запрос
+        val requestURL = URLMaker(constantsURLSet).makeURLRecipesList() // формируем URL запрос
         scope.launch (Dispatchers.IO) {
             remoteData = requestMaker!!.updateRecipesFromNet(requestURL)
-            hasRemoteResponse = true // выставлям флаг того, что ответ от запроса есть
+            hasRemoteResponse = true // выставлям флаг того, что ответ от url запроса есть
             if (remoteData != null) { // если ответ не налловый
                 if (hasLocalResponse) { // если уже есть ответ ответ из БД
-                    if (localData != null) { // если локальнаая дата пуста, в памяти пока нет ничего
-                        recipesDataCallbackInterface.onGotRecipesData(remoteData!!) // выводим что загрузили
+                    if (localData == null) { // если этот ответ от БД пуст, значит, в БД пока нет ничего
+                        Log.i("bugfix - recipesRepoManager", "has only net data, no local")
                         saveRecipesData(remoteData!!)
+                        showWholeRecipesBook(remoteData!!)
                         updatePhotos(remoteData!!)
-                    } else {
+                    } else { // ответ из БД не пуст. Нужно сравнить базы
                         val updatedData = ComparatorCombinator().compareAndCombineMaps(
                             comparableMap = localData!!,
                             updaterMap = remoteData!!)//todo: сравниваем, сохраняем разницу, обновляем книгу на экране
-                        if (updatedData != remoteData) {
-                            recipesDataCallbackInterface.onGotRecipesData(remoteData!!) // выводим что загрузили
-                            saveRecipesData(remoteData!!)
+                        if (updatedData != null) { // если по результатам сравнения есть отличия (null = отличий нет)
+                            Log.i("bugfix - recipesRepoManager", "has net and local data both. That is the different, updating one")
+                            saveRecipesData(updatedData)
+                            showWholeRecipesBook(updatedData)
                             updatePhotos(remoteData!!)
-                        }
+                        } else
+                            Log.i("bugfix - recipesRepoManager", "has net and local data both, and no any difference")
+
                     }
-                } else { // если ответа из БД еще нет
-                    recipesDataCallbackInterface.onGotRecipesData(remoteData!!)
+                } else { // если ответа из БД еще не поступил
+                    Log.i("bugfix - recipesRepoManager", "has net data, but has not local yet")
+                    showWholeRecipesBook(remoteData!!)
+                    //recipesDataCallbackInterface.onGotRecipesData(remoteData!!)
                     updatePhotos(remoteData!!) // выводим что загрузили, идем качать фотки
                 }
             } else { // если ответ налловый = доступа к сети нет
+                Log.i("bugfix - recipesRepoManager", "has no connection server data")
                 if (hasLocalResponse) { // сети нет, есть только локальный ответ
                     if (localData != null) {// если при этом локальные данные налловые,
                         logger.printToast("No data")// todo: (выводим заглушку?)
@@ -151,12 +158,21 @@ class RecipesRepositoryManager(
             if (loadedData != null) { // если есть неналловый результат из локальной базы
                 localData = loadedData
                 if (hasRemoteResponse) { // если ранее получили результат из сети
-                    //todo: сравниваем, и только сохраняем разницу
+                    Log.i("bugfix - recipesRepoManager", "has local data, has remote one")
+                    val updatedData = ComparatorCombinator().compareAndCombineMaps(
+                        comparableMap = localData!!,
+                        updaterMap = remoteData!!)//todo: сравниваем, сохраняем разницу, обновляем книгу на экране
+                    if (updatedData != null) { // если по результатам сравнения есть отличия (null = отличий нет)
+                        saveRecipesData(updatedData) //только сохраняем разницу
+                    }
                 } else { // если результата из сети пока нет
-                    recipesDataCallbackInterface.onGotRecipesData(remoteData!!) // выводим что загрузили
-                    updatePhotos(remoteData!!)
+                    Log.i("bugfix - recipesRepoManager", "has local data, has no remote one yet")
+                    showWholeRecipesBook(loadedData) // выводим что загрузили из БД
+                    updatePhotos(loadedData)
                 }
             } else { // если результат из локальной базы налловый
+                Log.i("bugfix - recipesRepoManager", "has local data is null")
+
                 if (hasRemoteResponse) { // если локального результата нет, но есть результат с сервера
                     if (remoteData != null) { // если при этом результат из сети неналловый
                         saveRecipesData(remoteData!!)// сохраняем его в базу
@@ -227,4 +243,9 @@ class RecipesRepositoryManager(
     private fun updateSinglePhoto(recipe: SingleRecipe, isFull: Boolean) {
         imagesDataDirector.getImage(recipe = recipe, isFull = isFull)
     }
+
+    private fun showWholeRecipesBook(remoteData: SortedMap<String, SingleRecipe>) {
+        recipesDataCallbackInterface.onGotRecipesData(remoteData) // выводим что загрузили
+    }
+
 }

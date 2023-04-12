@@ -12,6 +12,7 @@ import java.io.File
 class ImageLoader(val context: Context, val logger: ToasterAndLogger): ImageLoaderInterface {
 
     override fun loadImageByFileAddress(localAddress: String): Drawable? { // проверка и загрузка файла по его адресу
+        Log.i("bugfix - imageLoader", "loading image from local $localAddress")
         val file = File(localAddress) // создаем файл
         if (file.exists()) { // проверяем, существует ли он
             val bitmap = BitmapFactory.decodeFile(localAddress) // декодируем файл в картинку
