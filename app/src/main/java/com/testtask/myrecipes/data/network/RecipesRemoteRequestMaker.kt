@@ -26,20 +26,7 @@ import java.util.*
 const val TIMEOUT = 1000
 class RecipesRemoteRequestMaker(
     val logger: ToasterAndLogger,
-    val scope: CoroutineScope,
-    val resultCallback: RecipesNetRepositoryInterface
     ) {
-
-    fun makeAsyncRequest(url: String): JSONArray? {
-        var result: JSONArray? = null
-        scope.launch {
-            withContext(Dispatchers.Default) {
-                result = getJsonFromNet(url)
-                resultCallback.hasNetRecipesResponse(result)
-            }
-        }
-        return result
-    }
 
     fun updateRecipesFromNet(url: String): SortedMap<String, SingleRecipe>? {
         val resultJsonArray = getJsonFromNet(url)
@@ -81,7 +68,7 @@ class RecipesRemoteRequestMaker(
         }
     }
 
-    private fun connectionResult(connection: HttpURLConnection): JSONArray? {
+    private fun connectionResult(connection: HttpURLConnection): JSONArray {
         val response = StringBuilder()
         val inputStream = connection.inputStream
         val bufferedReader = BufferedReader(InputStreamReader(inputStream))
