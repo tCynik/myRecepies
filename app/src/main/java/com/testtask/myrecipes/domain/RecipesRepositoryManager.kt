@@ -111,7 +111,6 @@ class RecipesRepositoryManager(
                 } else { // если ответа из БД еще не поступил
                     Log.i("bugfix - recipesRepoManager", "has net data, but has not local yet")
                     showWholeRecipesBook(remoteData!!)
-                    //recipesDataCallbackInterface.onGotRecipesData(remoteData!!)
                     updatePhotos(remoteData!!) // выводим что загрузили, идем качать фотки
                 }
             } else { // если ответ налловый = доступа к сети нет

@@ -34,6 +34,9 @@ class RecipeViewModel: ViewModel() {
 
     var fragmentRecipesCallback: MainActivity.RecipeFragmentCallback? = null
 
+    var isNumberSelected = false
+    var currentNumber = 0
+
     fun initRepositoryManager( // передача зависимостей. Производится либо после запуска приложения, либо вручную при тестировании
         imageDownloader: ImageDownloaderInterface,
         imageLoader: ImageLoaderInterface,
@@ -45,7 +48,7 @@ class RecipeViewModel: ViewModel() {
                 // обновляем UI в главном потоке
                 val listData: List<SingleRecipe> = data.values.toList()
                 recipesDataLive.postValue(listData)
-
+                if (isNumberSelected) currentRecipeLive.postValue(listData[currentNumber])
                 // проверяем, не обновлялась ли полная картинка из фрагмента
                 checkAndUpdateFullPicture(data)
             }
@@ -67,9 +70,9 @@ class RecipeViewModel: ViewModel() {
         if (number == null) currentRecipeLive.value = null
         else {
             val currentRecipe = recipesDataLive.value!!.get(number)
-            currentRecipeLive.value = currentRecipe
-            Log.i("bugfix - ViewModel", "choosen recipe with id ${currentRecipeLive.value!!.id}")
             repositoryManager!!.getRecipeFullPicture(currentRecipe)
+            isNumberSelected = true
+            currentNumber = number
         }
     }
 
@@ -84,18 +87,7 @@ class RecipeViewModel: ViewModel() {
 
     fun pictureWasClicked(position: Int) { // получили команду о нажатии на картинку
         currentRecipeLive.value = recipesDataLive.value!!.get(position)
-
-
-        val recipe = recipesDataLive.value?.get(position)
-
-        // запускаем фрагмент с данными
-        val picture = recipe!!.pre_image.image
-        val name = recipe.name
-        //fragmentRecipesCallback!!.setRecipeScreen(picture!!, name)
         fragmentRecipesCallback!!.setRecipeIntoFragmentByNumber(position)
-
-        // запрашиваем обновление картинки
-        //repositoryManager!!.getRecipeFullPicture(recipe)
     }
 
     private fun checkAndUpdateFullPicture(data: SortedMap<String, SingleRecipe>) {
@@ -106,13 +98,7 @@ class RecipeViewModel: ViewModel() {
             if (fullImage != null) {
                 Log.i("bugfix - recipeViewModel", "updating the current recipe by full image")
                 currentRecipeLive.value = recipe
-                // todo: обновление на полную картинку происходит не по сигналу с ливдаты, а только при запуске фрагмента.
-                // todo: возможно, стоит обсервить ливдату из мэйнактивити, и уже оттуда вести обновление фрагмента?
-
-                // todo: при первоначальной загрузке фрагмента выдает, что полной картинки нет. Хотя ранее мы ее качали
-                // todo: Возможно, проблема в том, что логика менеджера предполагает сначала качать из инета, а потом лезть в память если не вышло?
             }
         }
-
     }
 }

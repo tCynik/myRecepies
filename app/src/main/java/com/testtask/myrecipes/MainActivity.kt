@@ -1,12 +1,11 @@
 package com.testtask.myrecipes
 
-import android.graphics.drawable.Drawable
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -24,8 +23,8 @@ import com.testtask.myrecipes.data.storage.image_load_save.ImageLoader
 import com.testtask.myrecipes.data.storage.image_load_save.ImageSaver
 import com.testtask.myrecipes.domain.ErrorsProcessor
 import com.testtask.myrecipes.presentation.ImageFragment
-import com.testtask.myrecipes.presentation.RecipesAdapter
 import com.testtask.myrecipes.presentation.RecipeViewModel
+import com.testtask.myrecipes.presentation.RecipesAdapter
 import com.testtask.myrecipes.presentation.interfaces.ToasterAndLogger
 
 class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
@@ -88,7 +87,6 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
 
         recipesViewModel!!.setFragmentCallback(getRecipeFragmentCallback())
 
-
         // запуск обновления данных
         recipesViewModel!!.updateDataWhenActivityCreated() // инициируем обновление данных
         // todo: обновление запускается автоматически при onCreate. При перевороте экрана так же будет обновляться, а это не нужно
@@ -111,7 +109,7 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
 
         recipesViewModel!!.publicCurrentRecipeLive.observe(
             this,
-            {currentRecipe -> Log.i("bugfix - mainActivity", "CURRENT RECIPE DATA UPDATED. Full picture exist = ${currentRecipe!!.full_image.image != null}")}
+            {currentRecipe -> if (currentRecipe!!.full_image.image != null) pictureFragment.setImage(currentRecipe!!.full_image.image!!) }
         )
     }
 
@@ -121,21 +119,11 @@ class MainActivity : AppCompatActivity(), RecipesAdapter.OnItemClickListener {
 
     override fun onPictureClick(view: View, position: Int) {
         recipesViewModel!!.pictureWasClicked(position) // VM сама решает, что делать с инфой о нажатии на картинку
-        Log.i ("bugfix: main", "picture in the item number $position in reciclerView was clicked")
     }
 
     override fun onTextClick(view: View, position: Int) {
         Log.i ("bugfix: main", "text in the item number $position in reciclerView was clicked")
     }
-
-//    private fun openPictureFragment(picture: Drawable, recipeName: String) {
-//        pictureFragment.setImage(picture)
-//        pictureFragment.setRecipeName(recipeName)
-//        val fTrans = supportFragmentManager.beginTransaction()
-//        fTrans.add(R.id.fragments_place, pictureFragment)
-//        fTrans.addToBackStack(null)
-//        fTrans.commit()
-//    }
 
     private fun getRecipeFragmentCallback(): RecipeFragmentCallback {
         return object: RecipeFragmentCallback {

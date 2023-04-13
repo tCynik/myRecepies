@@ -17,7 +17,7 @@ import java.util.*
 
 class RecipesStorage(
     val context: Context,
-    val dataBaseHelper: HelperInterface,
+    dataBaseHelper: HelperInterface,
     val logger: ToasterAndLogger
 ) : RecipesStorageInterface {
     val tableName = TableConstance.TABLE_RECIPES.value()
@@ -42,13 +42,10 @@ class RecipesStorage(
                 resultData[recipe.id] = recipe//.add(parser.parse(cursor))
                 isHasNext = cursor.moveToNext()
             }
-            val index = cursor.getColumnIndex(TableConstance.KEY_ID.value())
-            Log.i("bugfix: recipesStorage", "recipes data was loaded. loaded  = ${resultData.size}") // make toast
         } else { // todo: обработка того, что БД пустая
             return null
         }
 
-        val db = dataBaseHelper.getReadableDatabase()
         return resultData
     }
 

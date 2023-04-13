@@ -53,11 +53,10 @@ class ImageFragment(val context: MainActivity) : Fragment() { // контекс�
         textPlace = view.findViewById(R.id.recipe_name)
         viewModel!!.publicCurrentRecipeLive.observe(viewLifecycleOwner) { singleRecipe ->
             if (singleRecipe != null) {// context.runOnUiThread {
-                // todo: попробовать запустить без runOnUiThread, по идее должна выпадать ошибка обращения к UI не из главного потока
                 val name = singleRecipe.name
                 var picture = singleRecipe.full_image.image
                 Log.i("bugfix: ImageFragment", "ready to show picture full = ${picture!=null}")
-                if (picture == null) picture = singleRecipe.pre_image.image
+                //if (picture == null) picture = singleRecipe.pre_image.image
                 imagePlace!!.setImageDrawable(picture)
                 textPlace!!.text = name
             }

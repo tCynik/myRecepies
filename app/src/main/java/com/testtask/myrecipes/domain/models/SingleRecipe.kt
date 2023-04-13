@@ -72,6 +72,4 @@ data class SingleRecipe(
     override fun hashCode(): Int {
         return this.id.hashCode()
     }
-
-    // todo: descriprion is long text, maby an other type?
 }
